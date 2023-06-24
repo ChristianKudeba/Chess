@@ -21,106 +21,106 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="glad.c">
+    <ClCompile Include="Source Files\glad.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\Downloads\YoutubeOpenGL-master\YoutubeOpenGL-master\shaderClass.cpp">
-      <Filter>Resource Files\Shaders</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\Downloads\YoutubeOpenGL-master\YoutubeOpenGL-master\stb.cpp">
+    <ClCompile Include="Source Files\EBO.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\Downloads\YoutubeOpenGL-master\YoutubeOpenGL-master\Test.cpp">
+    <ClCompile Include="Source Files\Main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\Downloads\YoutubeOpenGL-master\YoutubeOpenGL-master\Texture.cpp">
+    <ClCompile Include="Source Files\shaderClass.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\Downloads\YoutubeOpenGL-master\YoutubeOpenGL-master\VAO.cpp">
+    <ClCompile Include="Source Files\stb.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\Downloads\YoutubeOpenGL-master\YoutubeOpenGL-master\VBO.cpp">
+    <ClCompile Include="Source Files\Test.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\Downloads\YoutubeOpenGL-master\YoutubeOpenGL-master\Main.cpp">
+    <ClCompile Include="Source Files\Texture.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\Downloads\YoutubeOpenGL-master\YoutubeOpenGL-master\EBO.cpp">
+    <ClCompile Include="Source Files\VAO.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source Files\VBO.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\..\Downloads\YoutubeOpenGL-master\YoutubeOpenGL-master\shaderClass.h">
+    <ClInclude Include="Header Files\EBO.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\Downloads\YoutubeOpenGL-master\YoutubeOpenGL-master\VBO.h">
+    <ClInclude Include="Header Files\shaderClass.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\Downloads\YoutubeOpenGL-master\YoutubeOpenGL-master\VAO.h">
+    <ClInclude Include="Header Files\Test.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\Downloads\YoutubeOpenGL-master\YoutubeOpenGL-master\Texture.h">
+    <ClInclude Include="Header Files\Texture.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\Downloads\YoutubeOpenGL-master\YoutubeOpenGL-master\Test.h">
+    <ClInclude Include="Header Files\VAO.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\Downloads\YoutubeOpenGL-master\YoutubeOpenGL-master\EBO.h">
+    <ClInclude Include="Header Files\VBO.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\..\..\Downloads\YoutubeOpenGL-master\YoutubeOpenGL-master\basic.frag">
+    <None Include="Resource Files\Shaders\basic.frag">
       <Filter>Resource Files\Shaders</Filter>
     </None>
-    <None Include="..\..\..\Downloads\YoutubeOpenGL-master\YoutubeOpenGL-master\basic.vert">
+    <None Include="Resource Files\Shaders\basic.vert">
       <Filter>Resource Files\Shaders</Filter>
     </None>
-    <None Include="..\..\..\Downloads\YoutubeOpenGL-master\YoutubeOpenGL-master\default.frag">
+    <None Include="Resource Files\Shaders\default.frag">
       <Filter>Resource Files\Shaders</Filter>
     </None>
-    <None Include="..\..\..\Downloads\YoutubeOpenGL-master\YoutubeOpenGL-master\default.vert">
+    <None Include="Resource Files\Shaders\default.vert">
       <Filter>Resource Files\Shaders</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>
-    <Image Include="..\..\..\Downloads\YoutubeOpenGL-master\YoutubeOpenGL-master\blackBishop.png">
+    <Image Include="Resource Files\Textures\blackBishop.png">
       <Filter>Resource Files\Textures</Filter>
     </Image>
-    <Image Include="..\..\..\Downloads\YoutubeOpenGL-master\YoutubeOpenGL-master\blackKing.png">
+    <Image Include="Resource Files\Textures\blackKing.png">
       <Filter>Resource Files\Textures</Filter>
     </Image>
-    <Image Include="..\..\..\Downloads\YoutubeOpenGL-master\YoutubeOpenGL-master\blackKnight.png">
+    <Image Include="Resource Files\Textures\blackKnight.png">
       <Filter>Resource Files\Textures</Filter>
     </Image>
-    <Image Include="..\..\..\Downloads\YoutubeOpenGL-master\YoutubeOpenGL-master\blackPawn.png">
+    <Image Include="Resource Files\Textures\blackPawn.png">
       <Filter>Resource Files\Textures</Filter>
     </Image>
-    <Image Include="..\..\..\Downloads\YoutubeOpenGL-master\YoutubeOpenGL-master\blackQueen.png">
+    <Image Include="Resource Files\Textures\blackQueen.png">
       <Filter>Resource Files\Textures</Filter>
     </Image>
-    <Image Include="..\..\..\Downloads\YoutubeOpenGL-master\YoutubeOpenGL-master\blackRook.png">
+    <Image Include="Resource Files\Textures\blackRook.png">
       <Filter>Resource Files\Textures</Filter>
     </Image>
-    <Image Include="..\..\..\Downloads\YoutubeOpenGL-master\YoutubeOpenGL-master\StartGame.png">
+    <Image Include="Resource Files\Textures\StartGame.png">
       <Filter>Resource Files\Textures</Filter>
     </Image>
-    <Image Include="..\..\..\Downloads\YoutubeOpenGL-master\YoutubeOpenGL-master\whiteBishop.png">
+    <Image Include="Resource Files\Textures\whiteBishop.png">
       <Filter>Resource Files\Textures</Filter>
     </Image>
-    <Image Include="..\..\..\Downloads\YoutubeOpenGL-master\YoutubeOpenGL-master\whiteKing.png">
+    <Image Include="Resource Files\Textures\whiteKing.png">
       <Filter>Resource Files\Textures</Filter>
     </Image>
-    <Image Include="..\..\..\Downloads\YoutubeOpenGL-master\YoutubeOpenGL-master\whiteKnight.png">
+    <Image Include="Resource Files\Textures\whiteKnight.png">
       <Filter>Resource Files\Textures</Filter>
     </Image>
-    <Image Include="..\..\..\Downloads\YoutubeOpenGL-master\YoutubeOpenGL-master\whitePawn.png">
+    <Image Include="Resource Files\Textures\whitePawn.png">
       <Filter>Resource Files\Textures</Filter>
     </Image>
-    <Image Include="..\..\..\Downloads\YoutubeOpenGL-master\YoutubeOpenGL-master\whiteQueen.png">
+    <Image Include="Resource Files\Textures\whiteQueen.png">
       <Filter>Resource Files\Textures</Filter>
     </Image>
-    <Image Include="..\..\..\Downloads\YoutubeOpenGL-master\YoutubeOpenGL-master\whiteRook.png">
+    <Image Include="Resource Files\Textures\whiteRook.png">
       <Filter>Resource Files\Textures</Filter>
     </Image>
   </ItemGroup>
