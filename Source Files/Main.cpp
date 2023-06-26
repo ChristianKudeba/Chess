@@ -5,6 +5,7 @@
 #include<stb/stb_image.h>
 #include<dwmapi.h>
 #include<vector>
+#include<iterator>
 #include<algorithm>
 
 #include"Texture.h"
@@ -20,6 +21,9 @@
 class chessPiece {
 private:
 
+	int pieceOrder;
+	int texOrder;
+	int vaoOrder;
 	char pieceType;
 	char pieceColour;
 	int ind;
@@ -52,13 +56,15 @@ private:
 
 public:
 	// Constructor
-	chessPiece(int squareIndex, int boardWidth, int boardHeight, char type, char colour, std::vector<chessPiece> pieceList, char postionArray[][2])
+	chessPiece(int vaoVecOrder, int textureVecOrder, int pieceListOrder, int squareIndex, int boardWidth, int boardHeight, char type, char colour, std::vector<chessPiece>& pieceList, std::vector<int>& postionArray)
 	{
+		pieceOrder = pieceListOrder;
+		texOrder = textureVecOrder;
+		vaoOrder = vaoVecOrder;
 		pieceType = type;
 		pieceColour = colour;
 		ind = squareIndex;
-		postionArray[ind][0] = pieceColour;
-		postionArray[ind][1] = pieceType;
+		postionArray[ind] = pieceOrder;
 		up = boardWidth;
 		right = 1;
 		totalSquareNum = boardWidth * boardHeight;
@@ -83,8 +89,10 @@ public:
 		// initialise scope
 		switch (pieceType) {
 		case 'P': // PAWN
+			#pragma region
 			switch (pieceColour) {
 				case 'w': // white
+					#pragma region
 					// Up
 					if (ind + mp1 < totalSquareNum) {
 						scope.push_back(ind + mp1);
@@ -99,7 +107,9 @@ public:
 						scope.push_back(ind + mp6);
 					}
 					break;
+					#pragma endregion
 				case 'b': // black
+					#pragma region
 					// Down
 					if (ind + mp2 >= 0) {
 						scope.push_back(ind + mp2);
@@ -114,9 +124,12 @@ public:
 						scope.push_back(ind + mp8);
 					}
 					break;
+					#pragma endregion
 			}			
 			break;
+			#pragma endregion
 		case 'N': //KNIGHT
+			#pragma region
 			// 2 Up 1 Right
 			if ((ind + mp9 < totalSquareNum) && ((ind + 1) % up != 0) && ((ind + 1) % up != up - 1)) {
 				scope.push_back(ind + mp9);
@@ -150,7 +163,9 @@ public:
 				scope.push_back(ind + mp16);
 			}
 			break;
+			#pragma endregion
 		case 'B': // BISHOP
+			#pragma region
 			// North-East Diagonal
 			for (int n = 1; n < 8; n++) {
 				if ((ind + n * mp5 < totalSquareNum) && ((ind + n * mp5) % up != 0)) {
@@ -180,7 +195,9 @@ public:
 				else { break; }
 			}
 			break;
+			#pragma endregion
 		case 'R': // ROOK
+			#pragma region
 			// Up
 			for (int n = 1; n < 8; n++) {
 				if (ind + n * mp1 < totalSquareNum) {
@@ -210,7 +227,9 @@ public:
 				else { break; }
 			}
 			break;
+			#pragma endregion
 		case 'Q': // QUEEN
+			#pragma region
 			// Up
 			for (int n = 1; n < 8; n++) {
 				if (ind + n * mp1 < totalSquareNum) {
@@ -268,7 +287,9 @@ public:
 				else { break; }
 			}
 			break;
+			#pragma endregion
 		case 'K': // KING
+			#pragma region
 			// The king has similar movement to the queen except it only moves one square in any direction, so no loops :)
 			// Up
 			if (ind + mp1 < totalSquareNum) {
@@ -303,33 +324,29 @@ public:
 				scope.push_back(ind + mp8);
 			}
 			break;
+			#pragma endregion
 		default:
 			scope.clear();
 		}
 	}
 
-	char getColour()
-	{
-		return pieceColour;
-	}
-
 	// Set new piece position and update scope 
-	void setPos(GLuint verticleDirection, GLuint horizontalDirection, char postionArray[][2])
+	void setPos(GLuint verticleDirection, GLuint horizontalDirection, std::vector<int>& postionArray)
 	{
-		postionArray[ind][0] = NULL;
-		postionArray[ind][1] = NULL;
+		postionArray[ind] = -1;
 		
 		ind = ind + verticleDirection * up + horizontalDirection * right;
 
-		postionArray[ind][0] = pieceColour;
-		postionArray[ind][1] = pieceType;
+		postionArray[ind] = pieceOrder;
 
 		scope.clear(); // Clear scope before adding new indices
 		// Update scope
 		switch (pieceType) {
 		case 'P': // PAWN
+			#pragma region
 			switch (pieceColour) {
 			case 'w': // white
+				#pragma region
 				// Up
 				if (ind + mp1 < totalSquareNum) {
 					scope.push_back(ind + mp1);
@@ -343,7 +360,9 @@ public:
 					scope.push_back(ind + mp6);
 				}
 				break;
+				#pragma endregion
 			case 'b': // black
+				#pragma region
 				// Down
 				if (ind + mp2 >= 0) {
 					scope.push_back(ind + mp2);
@@ -358,8 +377,11 @@ public:
 				}
 				break;
 			}
+				#pragma endregion
 			break;
+			#pragma endregion
 		case 'N': //KNIGHT
+			#pragma region
 			// 2 Up 1 Right
 			if ((ind + mp9 < totalSquareNum) && ((ind + 1) % up != 0) && ((ind + 1) % up != up - 1)) {
 				scope.push_back(ind + mp9);
@@ -393,7 +415,9 @@ public:
 				scope.push_back(ind + mp16);
 			}
 			break;
+			#pragma endregion
 		case 'B': // BISHOP
+			#pragma region
 			// North-East Diagonal
 			for (int n = 1; n < 8; n++) {
 				if ((ind + n * mp5 < totalSquareNum) && ((ind + n * mp5) % up != 0)) {
@@ -423,7 +447,9 @@ public:
 				else { break; }
 			}
 			break;
+			#pragma endregion
 		case 'R': // ROOK
+			#pragma region
 			// Up
 			for (int n = 1; n < 8; n++) {
 				if (ind + n * mp1 < totalSquareNum) {
@@ -452,8 +478,10 @@ public:
 				}
 				else { break; }
 			}
+			#pragma endregion
 			break;
 		case 'Q': // QUEEN
+			#pragma region
 			// Up
 			for (int n = 1; n < 8; n++) {
 				if (ind + n * mp1 < totalSquareNum) {
@@ -511,7 +539,9 @@ public:
 				else { break; }
 			}
 			break;
+			#pragma endregion
 		case 'K': // KING
+			#pragma region
 			// The king has similar movement to the queen except it only moves one square in any direction, so no loops :)
 			// Up
 			if (ind + mp1 < totalSquareNum) {
@@ -546,38 +576,31 @@ public:
 				scope.push_back(ind + mp8);
 			}
 			break;
+			#pragma endregion
 		default:
 			scope.clear();
 		}
 	}
 
-	int getPos()
-	{
-		return ind;
-	}
-
-	std::vector<int> getScope()
-	{
-		return scope;
-	}
-
 	// Generate and return piece moveSet for given board state
-	void setMoveSet(char postionArray[][2])
+	void setMoveSet(std::vector<int>& postionArray, std::vector<chessPiece>& listOfLivingPieces)
 	{
 		moveSet.clear(); // clear moveSet before adding new indices
 		
 		switch (pieceType) {
 		case 'P': // PAWN
+			#pragma region
 			switch (pieceColour) {
 			case 'w': // white
+				#pragma region
 				// Up
 				if (ind + mp1 < totalSquareNum) {
 					// if nothing in front of the pawn then it can move up
-					if (postionArray[ind + mp1][1] == NULL) {
+					if (postionArray[ind + mp1] == -1) {
 						moveSet.push_back(ind + mp1);
 						
-						// add another if here that deals with a pawn that has already moved
-						if (postionArray[ind + 2*mp1][1] == NULL) {
+						// if nothing two ahead of the pawn it can move up 2 
+						if (postionArray[ind + 2*mp1] == -1) {
 							moveSet.push_back(ind + 2 * mp1);
 						}
 					}
@@ -587,7 +610,7 @@ public:
 					// if the right diagonal in front of the pawn is a piece of the opposite colour 
 					// (or simply a different coloured piece if I add more colours to the game)
 					// then the pawn can capture so it goes in moveSet
-					if ((postionArray[ind + mp5][0] != pieceColour) && (postionArray[ind + mp5][0] != NULL)) {
+					if ((postionArray[ind + mp5] != -1) && (listOfLivingPieces[postionArray[ind + mp5]].getColour() != pieceColour)) {
 						moveSet.push_back(ind + mp5);
 					}
 				}
@@ -596,386 +619,446 @@ public:
 					// if the left diagonal in front of the pawn is a piece of the opposite colour 
 					// (or simply a different coloured piece if I add more colours to the game)
 					// then the pawn can capture so it goes in moveSet
-					if ((postionArray[ind + mp6][0] != pieceColour) && (postionArray[ind + mp5][0] != NULL)) {
+					if ((postionArray[ind + mp6] != -1) && (listOfLivingPieces[postionArray[ind + mp6]].getColour() != pieceColour)){
 						moveSet.push_back(ind + mp6);
 					}
 				}
 				break;
+				#pragma endregion
 			case 'b': // black
+				#pragma region
 				// Down
 				if (ind + mp2 >= 0) {
-					if (postionArray[ind + mp2][1] == NULL) {
+					if (postionArray[ind + mp2] == -1) {
 						moveSet.push_back(ind + mp2);
-						if (postionArray[ind + 2 * mp2][1] == NULL) {
+						if (postionArray[ind + 2 * mp2] == -1) {
 							moveSet.push_back(ind + 2 * mp2);
 						}
 					}
 				}
 				// South-East Diagonal
 				if ((ind + mp7 >= 0) && ((ind + 1) % up != 0)) {
-					if ((postionArray[ind + mp7][0] != pieceColour) && (postionArray[ind + mp7][0] != NULL)) {
+					if ((postionArray[ind + mp7] != -1) && (listOfLivingPieces[postionArray[ind + mp7]].getColour() != pieceColour)){
 						moveSet.push_back(ind + mp7);
 					}
 				}
 				// South-West Diagonal
 				if ((ind + mp8 >= 0) && ((ind + 1) % up != 1)) {
-					if ((postionArray[ind + mp8][0] != pieceColour) && (postionArray[ind + mp8][0] != NULL)) {
+					if ((postionArray[ind + mp8] != -1) && (listOfLivingPieces[postionArray[ind + mp8]].getColour() != pieceColour)){
 						moveSet.push_back(ind + mp8);
 					}
 				}
 				break;
 			}
+			#pragma endregion
 			break;
+			#pragma endregion
 		case 'N': //KNIGHT
+			#pragma region
 			// 2 Up 1 Right
-			if ((ind + mp9 < totalSquareNum) && ((ind + 1) % up != 0) && ((ind + 1) % up != up - 1)) {
+			if ((ind + mp9 < totalSquareNum) && ((ind + 1) % up != 0)) {
 				//  if there's no piece of the same colour on ind + mp9, then add ind + mp9 to moveSet
-				if (postionArray[ind + mp9][0] != pieceColour) {
+				if ((postionArray[ind + mp9] == -1) || (listOfLivingPieces[postionArray[ind + mp9]].getColour() != pieceColour)){
 					moveSet.push_back(ind + mp9);
 				}
 			}
 			// 2 Up 1 Left
-			if ((ind + mp10 < totalSquareNum) && ((ind + 1) % up != 1) && ((ind + 1) % up != 2)) {
-				if (postionArray[ind + mp10][0] != pieceColour) {
+			if ((ind + mp10 < totalSquareNum) && ((ind + 1) % up != 1)) {
+				if ((postionArray[ind + mp10] == -1) || (listOfLivingPieces[postionArray[ind + mp10]].getColour() != pieceColour)) {
 					moveSet.push_back(ind + mp10);
 				}
 			}
 			// 2 Down 1 Right
-			if ((ind + mp11 >= 0) && ((ind + 1) % up != 0) && ((ind + 1) % up != up - 1)) {
-				if (postionArray[ind + mp11][0] != pieceColour) {
+			if ((ind + mp11 >= 0) && ((ind + 1) % up != 0)) {
+				if ((postionArray[ind + mp11] == -1) || (listOfLivingPieces[postionArray[ind + mp11]].getColour() != pieceColour)) {
 					moveSet.push_back(ind + mp11);
 				}
 			}
 			// 2 Down 1 Left
-			if ((ind + mp12 >= 0) && ((ind + 1) % up != 1) && ((ind + 1) % up != 2)) {
-				if (postionArray[ind + mp12][0] != pieceColour) {
+			if ((ind + mp12 >= 0) && ((ind + 1) % up != 1)) {
+				if ((postionArray[ind + mp12] == -1) || (listOfLivingPieces[postionArray[ind + mp12]].getColour() != pieceColour)) {
 					moveSet.push_back(ind + mp12);
 				}
 			}
 			// 1 Up 2 Right
 			if ((ind + mp13 < totalSquareNum) && ((ind + 1) % up != 0) && ((ind + 1) % up != up - 1)) {
-				if (postionArray[ind + mp13][0] != pieceColour) {
+				if ((postionArray[ind + mp13] == -1) || (listOfLivingPieces[postionArray[ind + mp13]].getColour() != pieceColour)) {
 					moveSet.push_back(ind + mp13);
 				}
 			}
 			// 1 Up 2 Left
 			if ((ind + mp14 < totalSquareNum) && ((ind + 1) % up != 1) && ((ind + 1) % up != 2)) {
-				if (postionArray[ind + mp14][0] != pieceColour) {
+				if ((postionArray[ind + mp14] == -1) || (listOfLivingPieces[postionArray[ind + mp14]].getColour() != pieceColour)) {
 					moveSet.push_back(ind + mp14);
 				}
 			}
 			// 1 Down 2 Right
 			if ((ind + mp15 >= 0) && ((ind + 1) % up != 0) && ((ind + 1) % up != up - 1)) {
-				if (postionArray[ind + mp15][0] != pieceColour) {
+				if ((postionArray[ind + mp15] == -1) || (listOfLivingPieces[postionArray[ind + mp15]].getColour() != pieceColour)) {
 					moveSet.push_back(ind + mp15);
 				}
 			}
 			// 1 Down 2 Left
 			if ((ind + mp16 >= 0) && ((ind + 1) % up != 1) && ((ind + 1) % up != 2)) {
-				if (postionArray[ind + mp16][0] != pieceColour) {
+				if ((postionArray[ind + mp16] == -1) || (listOfLivingPieces[postionArray[ind + mp16]].getColour() != pieceColour)) {
 					moveSet.push_back(ind + mp16);
 				}
 			}
 			break;
+			#pragma endregion
 		case 'B': // BISHOP
+			#pragma region
 			// North-East Diagonal
-			for (int n = 1; n < 8; n++) {
+			for (int n = 1; n < totalSquareNum; n++) {
 				if ((ind + n * mp5 < totalSquareNum) && ((ind + n * mp5) % up != 0)) {
-					// if there's no piece of the same colour on ind + n*mp5, then add ind + n*mp5 to moveSet
-					// if there is a piece blocking that square, then don't add any more squares (along this diagonal) to moveSet
-					if (postionArray[ind + n * mp5][0] != pieceColour) {
+					// if there's no piece on ind + n*mp5, then add ind + n*mp5 to moveSet
+					if (postionArray[ind + n * mp5] == -1) {
 						moveSet.push_back(ind + n * mp5);
-						// if there was a piece of a different colour then after you've added that square to the moveSet 
-						// stop adding squares along this diagonal
-						if (postionArray[ind + n * mp5][1] != NULL) {
-							break;
-						}
 					}
+					// if there is a piece of another colour on that square, then don't add ind + n*mp5 as the last move from this diagonal to moveSet
+					else if (listOfLivingPieces[postionArray[ind + n * mp5]].getColour() != pieceColour) {
+						moveSet.push_back(ind + n * mp5);
+						break;
+					}
+					// if there is a piece of the same colour, than don't add any more squares (along this diagonal) to moveSet
 					else { break; }
 				}
 				else { break; }
 			}
 			// North-West Diagonal
-			for (int n = 1; n < 8; n++) {
+			for (int n = 1; n < totalSquareNum; n++) {
 				if ((ind + n * mp6 < totalSquareNum) && ((ind + 1 + n * mp6) % up != 0)) {
-					if (postionArray[ind + n * mp6][0] != pieceColour) {
+					if (postionArray[ind + n * mp6] == -1) {
 						moveSet.push_back(ind + n * mp6);
-
-						if (postionArray[ind + n * mp6][1] != NULL) {
-							break;
-						}
+					}
+					else if (listOfLivingPieces[postionArray[ind + n * mp6]].getColour() != pieceColour) {
+						moveSet.push_back(ind + n * mp6);
+						break;
 					}
 					else { break; }
 				}
 				else { break; }
 			}
 			// South-East Diagonal
-			for (int n = 1; n < 8; n++) {
-				if ((ind + n * mp7 >= 0) && ((ind + n * mp7) % up != 0)) {
-					if (postionArray[ind + n * mp7][0] != pieceColour) {
+			for (int n = 1; n < totalSquareNum; n++) {
+				if ((ind + n * mp7 >= 0) && ((ind + n * mp7) % up != 0)) { // add condition so it can't go below 0
+					if (postionArray[ind + n * mp7] == -1) {
 						moveSet.push_back(ind + n * mp7);
-
-						if (postionArray[ind + n * mp7][1] != NULL) {
-							break;
-						}
+					}
+					else if (listOfLivingPieces[postionArray[ind + n * mp7]].getColour() != pieceColour) {
+						moveSet.push_back(ind + n * mp7);
+						break;
 					}
 					else { break; }
 				}
 				else { break; }
 			}
 			// South-West Diagonal
-			for (int n = 1; n < 8; n++) {
+			for (int n = 1; n < totalSquareNum; n++) {
 				if ((ind + n * mp8 >= 0) && ((ind + 1 + n * mp8) % up != 0)) {
-					if (postionArray[ind + n * mp8][0] != pieceColour) {
+					if (postionArray[ind + n * mp8] == -1) {
 						moveSet.push_back(ind + n * mp8);
-
-						if (postionArray[ind + n * mp8][1] != NULL) {
-							break;
-						}
+					}
+					else if (listOfLivingPieces[postionArray[ind + n * mp8]].getColour() != pieceColour) {
+						moveSet.push_back(ind + n * mp8);
+						break;
 					}
 					else { break; }
 				}
 				else { break; }
 			}
 			break;
+			#pragma endregion
 		case 'R': // ROOK
+			#pragma region
 			// Up
-			for (int n = 1; n < 8; n++) {
+			for (int n = 1; n < totalSquareNum; n++) {
 				if (ind + n * mp1 < totalSquareNum) {
-					// if there's no piece of the same colour on ind + n*mp1, then add ind + n*mp1 to moveSet
-					// if there is a piece blocking that square, then don't add any more squares (line) to moveSet
-					if (postionArray[ind + n * mp1][0] != pieceColour) {
+					if (postionArray[ind + n * mp1] == -1) {
 						moveSet.push_back(ind + n * mp1);
-
-						if (postionArray[ind + n * mp1][1] != NULL) {
-							break;
-						}
+					}
+					else if (listOfLivingPieces[postionArray[ind + n * mp1]].getColour() != pieceColour) {
+						moveSet.push_back(ind + n * mp1);
+						break;
 					}
 					else { break; }
 				}
 				else { break; }
 			}
 			// Down
-			for (int n = 1; n < 8; n++) {
+			for (int n = 1; n < totalSquareNum; n++) {
 				if (ind + n * mp2 >= 0) {
-					if (postionArray[ind + n * mp2][0] != pieceColour) {
+					if (postionArray[ind + n * mp2] == -1) {
 						moveSet.push_back(ind + n * mp2);
-
-						if (postionArray[ind + n * mp2][1] != NULL) {
-							break;
-						}
+					}
+					else if (listOfLivingPieces[postionArray[ind + n * mp2]].getColour() != pieceColour) {
+						moveSet.push_back(ind + n * mp2);
+						break;
 					}
 					else { break; }
 				}
 				else { break; }
 			}
 			// Right
-			for (int n = 1; n < 8; n++) {
+			for (int n = 1; n < totalSquareNum; n++) {
 				if (((ind + 1) % up != 0) && ((ind + n * mp3) % up != 0)) {
-					if (postionArray[ind + n * mp3][0] != pieceColour) {
+					if (postionArray[ind + n * mp3] == -1) {
 						moveSet.push_back(ind + n * mp3);
-
-						if (postionArray[ind + n * mp3][1] != NULL) {
-							break;
-						}
+					}
+					else if (listOfLivingPieces[postionArray[ind + n * mp3]].getColour() != pieceColour) {
+						moveSet.push_back(ind + n * mp3);
+						break;
 					}
 					else { break; }
 				}
 				else { break; }
 			}
 			// Left
-			for (int n = 1; n < 8; n++) {
+			for (int n = 1; n < totalSquareNum; n++) {
 				if (((ind + 1) % up != 1) && ((ind + 1 + n * mp4) % up != 0)) {
-					if (postionArray[ind + n * mp4][0] != pieceColour) {
+					if (postionArray[ind + n * mp4] == -1) {
 						moveSet.push_back(ind + n * mp4);
-
-						if (postionArray[ind + n * mp4][1] != NULL) {
-							break;
-						}
+					}
+					else if (listOfLivingPieces[postionArray[ind + n * mp4]].getColour() != pieceColour) {
+						moveSet.push_back(ind + n * mp4);
+						break;
 					}
 					else { break; }
 				}
 				else { break; }
 			}
 			break;
+			#pragma endregion
 		case 'Q': // QUEEN
-			// Up
-			for (int n = 1; n < 8; n++) {
-				if (ind + n * mp1 < totalSquareNum) {
-					// if there's no piece of the same colour on ind + n*mp1, then add ind + n*mp1 to moveSet
-					// if there is a piece blocking that square, then don't add any more squares (line) to moveSet
-					if (postionArray[ind + n * mp1][0] != pieceColour) {
-						moveSet.push_back(ind + n * mp1);
-
-						if (postionArray[ind + n * mp1][1] != NULL) {
-							break;
-						}
-					}
-					else { break; }
-				}
-				else { break; }
-			}
-			// Down
-			for (int n = 1; n < 8; n++) {
-				if (ind + n * mp2 >= 0) {
-					if (postionArray[ind + n * mp2][0] != pieceColour) {
-						moveSet.push_back(ind + n * mp2);
-
-						if (postionArray[ind + n * mp2][1] != NULL) {
-							break;
-						}
-					}
-					else { break; }
-				}
-				else { break; }
-			}
-			// Right
-			for (int n = 1; n < 8; n++) {
-				if (((ind + 1) % up != 0) && ((ind + n * mp3) % up != 0)) {
-					if (postionArray[ind + n * mp3][0] != pieceColour) {
-						moveSet.push_back(ind + n * mp3);
-
-						if (postionArray[ind + n * mp3][1] != NULL) {
-							break;
-						}
-					}
-					else { break; }
-				}
-				else { break; }
-			}
-			// Left
-			for (int n = 1; n < 8; n++) {
-				if (((ind + 1) % up != 1) && ((ind + 1 + n * mp4) % up != 0)) {
-					if (postionArray[ind + n * mp4][0] != pieceColour) {
-						moveSet.push_back(ind + n * mp4);
-
-						if (postionArray[ind + n * mp4][1] != NULL) {
-							break;
-						}
-					}
-					else { break; }
-				}
-				else { break; }
-			}
+			#pragma region
 			// North-East Diagonal
-			for (int n = 1; n < 8; n++) {
+			for (int n = 1; n < totalSquareNum; n++) {
 				if ((ind + n * mp5 < totalSquareNum) && ((ind + n * mp5) % up != 0)) {
-					// if there's no piece of the same colour on ind + n*mp5, then add ind + n*mp5 to moveSet
-					// if there is a piece blocking that square, then don't add any more squares (along this diagonal) to moveSet
-					if (postionArray[ind + n * mp5][0] != pieceColour) {
+					if (postionArray[ind + n * mp5] == -1) {
 						moveSet.push_back(ind + n * mp5);
-
-						if (postionArray[ind + n * mp5][1] != NULL) {
-							break;
-						}
+					}
+					else if (listOfLivingPieces[postionArray[ind + n * mp5]].getColour() != pieceColour) {
+						moveSet.push_back(ind + n * mp5);
+						break;
 					}
 					else { break; }
 				}
 				else { break; }
 			}
 			// North-West Diagonal
-			for (int n = 1; n < 8; n++) {
-				if ((ind + n * mp6 < totalSquareNum) && ((ind + 1 + n * mp6) % up != 0)) {
-					if (postionArray[ind + n * mp6][0] != pieceColour) {
+			for (int n = 1; n < totalSquareNum; n++) {
+				if ((ind + n * mp6 < totalSquareNum) && ((ind + n * mp6) % up != 0)) {
+					if (postionArray[ind + n * mp6] == -1) {
 						moveSet.push_back(ind + n * mp6);
-
-						if (postionArray[ind + n * mp6][1] != NULL) {
-							break;
-						}
+					}
+					else if (listOfLivingPieces[postionArray[ind + n * mp6]].getColour() != pieceColour) {
+						moveSet.push_back(ind + n * mp6);
+						break;
 					}
 					else { break; }
 				}
 				else { break; }
 			}
 			// South-East Diagonal
-			for (int n = 1; n < 8; n++) {
+			for (int n = 1; n < totalSquareNum; n++) {
 				if ((ind + n * mp7 >= 0) && ((ind + n * mp7) % up != 0)) {
-					if (postionArray[ind + n * mp7][0] != pieceColour) {
+					if (postionArray[ind + n * mp7] == -1) {
 						moveSet.push_back(ind + n * mp7);
-
-						if (postionArray[ind + n * mp7][1] != NULL) {
-							break;
-						}
+					}
+					else if (listOfLivingPieces[postionArray[ind + n * mp7]].getColour() != pieceColour) {
+						moveSet.push_back(ind + n * mp7);
+						break;
 					}
 					else { break; }
 				}
 				else { break; }
 			}
 			// South-West Diagonal
-			for (int n = 1; n < 8; n++) {
+			for (int n = 1; n < totalSquareNum; n++) {
 				if ((ind + n * mp8 >= 0) && ((ind + 1 + n * mp8) % up != 0)) {
-					if (postionArray[ind + n * mp8][0] != pieceColour) {
+					if (postionArray[ind + n * mp8] == -1) {
 						moveSet.push_back(ind + n * mp8);
-
-						if (postionArray[ind + n * mp8][1] != NULL) {
-							break;
-						}
+					}
+					else if (listOfLivingPieces[postionArray[ind + n * mp8]].getColour() != pieceColour) {
+						moveSet.push_back(ind + n * mp8);
+						break;
+					}
+					else { break; }
+				}
+				else { break; }
+			}
+			// Up
+			for (int n = 1; n < totalSquareNum; n++) {
+				if (ind + n * mp1 < totalSquareNum) {
+					if (postionArray[ind + n * mp1] == -1) {
+						moveSet.push_back(ind + n * mp1);
+					}
+					else if (listOfLivingPieces[postionArray[ind + n * mp1]].getColour() != pieceColour) {
+						moveSet.push_back(ind + n * mp1);
+						break;
+					}
+					else { break; }
+				}
+				else { break; }
+			}
+			// Down
+			for (int n = 1; n < totalSquareNum; n++) {
+				if (ind + n * mp2 >= 0) {
+					if (postionArray[ind + n * mp2] == -1) {
+						moveSet.push_back(ind + n * mp2);
+					}
+					else if (listOfLivingPieces[postionArray[ind + n * mp2]].getColour() != pieceColour) {
+						moveSet.push_back(ind + n * mp2);
+						break;
+					}
+					else { break; }
+				}
+				else { break; }
+			}
+			// Right
+			for (int n = 1; n < totalSquareNum; n++) {
+				if (((ind + 1) % up != 0) && ((ind + n * mp3) % up != 0)) {
+					if (postionArray[ind + n * mp3] == -1) {
+						moveSet.push_back(ind + n * mp3);
+					}
+					else if (listOfLivingPieces[postionArray[ind + n * mp3]].getColour() != pieceColour) {
+						moveSet.push_back(ind + n * mp3);
+						break;
+					}
+					else { break; }
+				}
+				else { break; }
+			}
+			// Left
+			for (int n = 1; n < totalSquareNum; n++) {
+				if (((ind + 1) % up != 1) && ((ind + 1 + n * mp4) % up != 0)) {
+					if (postionArray[ind + n * mp4] == -1) {
+						moveSet.push_back(ind + n * mp4);
+					}
+					else if (listOfLivingPieces[postionArray[ind + n * mp4]].getColour() != pieceColour) {
+						moveSet.push_back(ind + n * mp4);
+						break;
 					}
 					else { break; }
 				}
 				else { break; }
 			}
 			break;
+			#pragma endregion
 		case 'K': // KING
+			#pragma region
 			// The king has similar movement to the queen except it only moves one square in any direction, so no loops :)
 			// Up
 			if (ind + mp1 < totalSquareNum) {
-				if (postionArray[ind + mp1][0] != pieceColour) {
+				if ((postionArray[ind + mp1] == -1) || (listOfLivingPieces[postionArray[ind + mp1]].getColour() != pieceColour)) {
 					moveSet.push_back(ind + mp1);
 				}
 			}
 			// Down
 			if (ind + mp2 >= 0) {
-				if (postionArray[ind + mp2][0] != pieceColour) {
+				if ((postionArray[ind + mp2] == -1) || (listOfLivingPieces[postionArray[ind + mp2]].getColour() != pieceColour)) {
 					moveSet.push_back(ind + mp2);
 				}
 			}
 			// Right
 			if ((ind + 1) % up != 0) {
-				if (postionArray[ind + mp3][0] != pieceColour) {
+				if ((postionArray[ind + mp3] == -1) || (listOfLivingPieces[postionArray[ind + mp3]].getColour() != pieceColour)) {
 					moveSet.push_back(ind + mp3);
 				}
 			}
 			// Left
 			if ((ind + 1) % up != 1) {
-				if (postionArray[ind + mp4][0] != pieceColour) {
+				if ((postionArray[ind + mp4] == -1) || (listOfLivingPieces[postionArray[ind + mp4]].getColour() != pieceColour)) {
 					moveSet.push_back(ind + mp4);
 				}
 			}
 			// North-East Diagonal
 			if ((ind + mp5 < totalSquareNum) && ((ind + 1) % up != 0)) {
-				if (postionArray[ind + mp5][0] != pieceColour) {
+				if ((postionArray[ind + mp5] == -1) || (listOfLivingPieces[postionArray[ind + mp5]].getColour() != pieceColour)) {
 					moveSet.push_back(ind + mp5);
 				}
 			}
 			// North-West Diagonal
 			if ((ind + mp6 < totalSquareNum) && ((ind + 1) % up != 1)) {
-				if (postionArray[ind + mp6][0] != pieceColour) {
+				if ((postionArray[ind + mp6] == -1) || (listOfLivingPieces[postionArray[ind + mp6]].getColour() != pieceColour)) {
 					moveSet.push_back(ind + mp6);
 				}
 			}
 			// South-East Diagonal
 			if ((ind + mp7 >= 0) && ((ind + 1) % up != 0)) {
-				if (postionArray[ind + mp7][0] != pieceColour) {
+				if ((postionArray[ind + mp7] == -1) || (listOfLivingPieces[postionArray[ind + mp7]].getColour() != pieceColour)) {
 					moveSet.push_back(ind + mp7);
 				}
 			}
 			// South-West Diagonal
 			if ((ind + mp8 >= 0) && ((ind + 1) % up != 1)) {
-				if (postionArray[ind + mp8][0] != pieceColour) {
+				if ((postionArray[ind + mp8] == -1) || (listOfLivingPieces[postionArray[ind + mp8]].getColour() != pieceColour)) {
 					moveSet.push_back(ind + mp8);
 				}
 			}
 			break;
+			#pragma endregion
 		default:
 			moveSet.clear();
 		}
+	}
+
+	void setOrder(int listOrder, std::vector<int>& postionArray) {
+		pieceOrder = listOrder;
+		postionArray[ind] = pieceOrder;
+	}
+
+	std::vector<int> getScope()
+	{
+		return scope;
 	}
 
 	std::vector<int> getMoveSet()
 	{
 		return moveSet;
 	}
+
+	int getPos()
+	{
+		return ind;
+	}
+
+	int getTexOrder() {
+		return texOrder;
+	}
+
+	int getVaoOrder() {
+		return vaoOrder;
+	}
+
+	char getColour()
+	{
+		return pieceColour;
+	}
+
+
+	/*
+	void getCaptured(std::vector<chessPiece> listOfLivingPieces, std::vector<chessPiece> listOfDeadPieces, int livingListIndex) {
+		
+		// Add piece to dead piece vector and update its order
+		int newOrder = listOfDeadPieces.size() - 1;
+		listOfDeadPieces.push_back(listOfLivingPieces[livingListIndex]);
+		listOfDeadPieces[newOrder].setOrder(newOrder);
+
+		// Remove piece from live piece vector
+		std::vector<chessPiece>::iterator ptr;
+		ptr = listOfLivingPieces.begin();
+		advance(ptr, livingListIndex);
+		listOfLivingPieces.erase(ptr);
+
+		// Update order for all the pieces in live vector that came after the piece we just removed
+		for (int i = livingListIndex; i < (listOfLivingPieces.size() - 1); i++) {
+			listOfLivingPieces[i].setOrder(i);
+		}
+
+		// Move the (now dead) piece off the board - into the graveyard...
+	}
+	*/
 
 };
 
@@ -1065,90 +1148,136 @@ int main()
 		squareIndices[m][5] = m + n + 1;
 	};
 
-	// TEST array of chars indicating what piece type/colour is on each square
+
+
+	// GRAVEYARD vertices
+	GLfloat graveyardVertices[bufferAttribNum * 2 * (boardWidth + 1)]{};
+	for (int i = 0; i < 2; ++i) { // columns
+		for (int j = 0; j < (boardWidth + 1); ++j) { // rows
+			graveyardVertices[(bufferAttribNum * ((boardWidth + 1) * i + j))] = 0.1f * float(j - boardWidth / 2); // xPos
+			graveyardVertices[(bufferAttribNum * ((boardWidth + 1) * i + j)) + 1] = 0.1f * float(i + 5 + boardHeight / 2); // yPos
+			graveyardVertices[(bufferAttribNum * ((boardWidth + 1) * i + j)) + 2] = 0.0f;  // zPos
+			graveyardVertices[(bufferAttribNum * ((boardWidth + 1) * i + j)) + 3] = 0.0f;  // R
+			graveyardVertices[(bufferAttribNum * ((boardWidth + 1) * i + j)) + 4] = 0.0f;  // G
+			graveyardVertices[(bufferAttribNum * ((boardWidth + 1) * i + j)) + 5] = 0.0f;  // B
+			graveyardVertices[(bufferAttribNum * ((boardWidth + 1) * i + j)) + 6] = float(j);  // Texture xCoord
+			graveyardVertices[(bufferAttribNum * ((boardWidth + 1) * i + j)) + 7] = float(i);  // Texture yCoord
+		}
+	}
+
+	// GRAVEYARD indices
+	GLuint graveyardIndices[2 * boardWidth][6]{};
+	n = 0;
+	for (int m = 0; m < (2 * boardWidth); ++m)
+	{
+		if (((m + n + 1) % (boardWidth + 1)) == 0) // if m represents an "edge" vertex
+		{
+			n++;
+		}
+
+
+		// graveyardIndices are used to determine the placement of pieces when they die
+		graveyardIndices[m][0] = m + n;
+		graveyardIndices[m][1] = m + n + boardWidth + 2;
+		graveyardIndices[m][2] = m + n + boardWidth + 1;
+		graveyardIndices[m][3] = m + n;
+		graveyardIndices[m][4] = m + n + boardWidth + 2;
+		graveyardIndices[m][5] = m + n + 1;
+	};
+
+
+
+	// Vector of ints indicating which piece is on each square
 	// the purpose of this is so we don't have to loop through pieceList to 
 	// check what piece (if any) is on a particular square
-	char piecePositions[boardHeight * boardWidth][2];
-	for (int z = 1; z < (boardHeight * boardWidth); z++) {
-		piecePositions[z][0] = NULL;
-		piecePositions[z][1] = NULL;
-	}
+	std::vector<int> piecePositions(boardHeight * boardWidth, -1);
+	
+	//int piecePositions[boardHeight * boardWidth];
+	//for (int z = 1; z < (boardHeight * boardWidth); z++) {
+	//	piecePositions[z] = NULL;
+	//}
+
+
 	#pragma endregion
 
 
 	// INITIALISE PIECE OBJECTS
 	#pragma region
 
-	// Vector of chesspieces, makes accessing the pieces much easier
-	std::vector<chessPiece> pieceList{};
+	// Vector of LIVE chesspieces, makes accessing the pieces much easier
+	std::vector<chessPiece> livePieceList{};
 
 	// White Rook1
-	chessPiece whiteRook1(0, boardWidth, boardHeight, 'R', 'w', pieceList, piecePositions);
+	chessPiece whiteRook1(0, 4, 0, 0, boardWidth, boardHeight, 'R', 'w', livePieceList, piecePositions);
 	// White Knight1
-	chessPiece whiteKnight1(1, boardWidth, boardHeight, 'N', 'w', pieceList, piecePositions);
+	chessPiece whiteKnight1(1, 8, 1, 1, boardWidth, boardHeight, 'N', 'w', livePieceList, piecePositions);
 	// White Bishop1
-	chessPiece whiteBishop1(2, boardWidth, boardHeight, 'B', 'w', pieceList, piecePositions);
+	chessPiece whiteBishop1(2, 6, 2, 2, boardWidth, boardHeight, 'B', 'w', livePieceList, piecePositions);
 	// White Queen
-	chessPiece whiteQueen(3, boardWidth, boardHeight, 'Q', 'w', pieceList, piecePositions);
+	chessPiece whiteQueen(3, 2, 3, 3, boardWidth, boardHeight, 'Q', 'w', livePieceList, piecePositions);
 	// White King
-	chessPiece whiteKing(4, boardWidth, boardHeight, 'K', 'w', pieceList, piecePositions);
+	chessPiece whiteKing(4, 0, 4, 4, boardWidth, boardHeight, 'K', 'w', livePieceList, piecePositions);
 	// White Bishop2
-	chessPiece whiteBishop2(5, boardWidth, boardHeight, 'B', 'w', pieceList, piecePositions);
+	chessPiece whiteBishop2(5, 6, 5, 5, boardWidth, boardHeight, 'B', 'w', livePieceList, piecePositions);
 	// White Knight2
-	chessPiece whiteKnight2(6, boardWidth, boardHeight, 'N', 'w', pieceList, piecePositions);
+	chessPiece whiteKnight2(6, 8, 6, 6, boardWidth, boardHeight, 'N', 'w', livePieceList, piecePositions);
 	// White Rook2
-	chessPiece whiteRook2(7, boardWidth, boardHeight, 'R', 'w', pieceList, piecePositions);
+	chessPiece whiteRook2(7, 4, 7, 7, boardWidth, boardHeight, 'R', 'w', livePieceList, piecePositions);
 	// White Pawn1
-	chessPiece whitePawn1(8, boardWidth, boardHeight, 'P', 'w', pieceList, piecePositions);
+	chessPiece whitePawn1(8, 10, 8, 8, boardWidth, boardHeight, 'P', 'w', livePieceList, piecePositions);
 	// White Pawn2
-	chessPiece whitePawn2(9, boardWidth, boardHeight, 'P', 'w', pieceList, piecePositions);
+	chessPiece whitePawn2(9, 10, 9, 9, boardWidth, boardHeight, 'P', 'w', livePieceList, piecePositions);
 	// White Pawn3
-	chessPiece whitePawn3(10, boardWidth, boardHeight, 'P', 'w', pieceList, piecePositions);
+	chessPiece whitePawn3(10, 10, 10, 10, boardWidth, boardHeight, 'P', 'w', livePieceList, piecePositions);
 	// White Pawn4
-	chessPiece whitePawn4(11, boardWidth, boardHeight, 'P', 'w', pieceList, piecePositions);
+	chessPiece whitePawn4(11, 10, 11, 11, boardWidth, boardHeight, 'P', 'w', livePieceList, piecePositions);
 	// White Pawn5
-	chessPiece whitePawn5(12, boardWidth, boardHeight, 'P', 'w', pieceList, piecePositions);
+	chessPiece whitePawn5(12, 10, 12, 12, boardWidth, boardHeight, 'P', 'w', livePieceList, piecePositions);
 	// White Pawn6
-	chessPiece whitePawn6(13, boardWidth, boardHeight, 'P', 'w', pieceList, piecePositions);
+	chessPiece whitePawn6(13, 10, 13, 13, boardWidth, boardHeight, 'P', 'w', livePieceList, piecePositions);
 	// White Pawn7
-	chessPiece whitePawn7(14, boardWidth, boardHeight, 'P', 'w', pieceList, piecePositions);
+	chessPiece whitePawn7(14, 10, 14, 14, boardWidth, boardHeight, 'P', 'w', livePieceList, piecePositions);
 	// White Pawn8
-	chessPiece whitePawn8(15, boardWidth, boardHeight, 'P', 'w', pieceList, piecePositions);
+	chessPiece whitePawn8(15, 10, 15, 15, boardWidth, boardHeight, 'P', 'w', livePieceList, piecePositions);
 	// Black Pawn1
-	chessPiece blackPawn1(48, boardWidth, boardHeight, 'P', 'b', pieceList, piecePositions);
+	chessPiece blackPawn1(16, 11, 16, 48, boardWidth, boardHeight, 'P', 'b', livePieceList, piecePositions);
 	// Black Pawn2
-	chessPiece blackPawn2(49, boardWidth, boardHeight, 'P', 'b', pieceList, piecePositions);
+	chessPiece blackPawn2(17, 11, 17, 49, boardWidth, boardHeight, 'P', 'b', livePieceList, piecePositions);
 	// Black Pawn3
-	chessPiece blackPawn3(50, boardWidth, boardHeight, 'P', 'b', pieceList, piecePositions);
+	chessPiece blackPawn3(18, 11, 18, 50, boardWidth, boardHeight, 'P', 'b', livePieceList, piecePositions);
 	// Black Pawn4
-	chessPiece blackPawn4(51, boardWidth, boardHeight, 'P', 'b', pieceList, piecePositions);
+	chessPiece blackPawn4(19, 11, 19, 51, boardWidth, boardHeight, 'P', 'b', livePieceList, piecePositions);
 	// Black Pawn5
-	chessPiece blackPawn5(52, boardWidth, boardHeight, 'P', 'b', pieceList, piecePositions);
+	chessPiece blackPawn5(20, 11, 20, 52, boardWidth, boardHeight, 'P', 'b', livePieceList, piecePositions);
 	// Black Pawn6
-	chessPiece blackPawn6(53, boardWidth, boardHeight, 'P', 'b', pieceList, piecePositions);
+	chessPiece blackPawn6(21, 11, 21, 53, boardWidth, boardHeight, 'P', 'b', livePieceList, piecePositions);
 	// Black Pawn7
-	chessPiece blackPawn7(54, boardWidth, boardHeight, 'P', 'b', pieceList, piecePositions);
+	chessPiece blackPawn7(22, 11, 22, 54, boardWidth, boardHeight, 'P', 'b', livePieceList, piecePositions);
 	// Black Pawn8
-	chessPiece blackPawn8(55, boardWidth, boardHeight, 'P', 'b', pieceList, piecePositions);
+	chessPiece blackPawn8(23, 11, 23, 55, boardWidth, boardHeight, 'P', 'b', livePieceList, piecePositions);
 	// Black Rook1
-	chessPiece blackRook1(56, boardWidth, boardHeight, 'R', 'b', pieceList, piecePositions);
+	chessPiece blackRook1(24, 5, 24, 56, boardWidth, boardHeight, 'R', 'b', livePieceList, piecePositions);
 	// Black Knight1
-	chessPiece blackKnight1(57, boardWidth, boardHeight, 'N', 'b', pieceList, piecePositions);
+	chessPiece blackKnight1(25, 9, 25, 57, boardWidth, boardHeight, 'N', 'b', livePieceList, piecePositions);
 	// Black Bishop1
-	chessPiece blackBishop1(58, boardWidth, boardHeight, 'B', 'b', pieceList, piecePositions);
+	chessPiece blackBishop1(26, 7, 26, 58, boardWidth, boardHeight, 'B', 'b', livePieceList, piecePositions);
 	// Black Queen
-	chessPiece blackQueen(59, boardWidth, boardHeight, 'Q', 'b', pieceList, piecePositions);
+	chessPiece blackQueen(27, 3, 27, 59, boardWidth, boardHeight, 'Q', 'b', livePieceList, piecePositions);
 	// Black King
-	chessPiece blackKing(60, boardWidth, boardHeight, 'K', 'b', pieceList, piecePositions);
+	chessPiece blackKing(28, 1, 28, 60, boardWidth, boardHeight, 'K', 'b', livePieceList, piecePositions);
 	// Black Bishop2
-	chessPiece blackBishop2(61, boardWidth, boardHeight, 'B', 'b', pieceList, piecePositions);
+	chessPiece blackBishop2(29, 7, 29, 61, boardWidth, boardHeight, 'B', 'b', livePieceList, piecePositions);
 	// Black Knight2
-	chessPiece blackKnight2(62, boardWidth, boardHeight, 'N', 'b', pieceList, piecePositions);
+	chessPiece blackKnight2(30, 9, 30, 62, boardWidth, boardHeight, 'N', 'b', livePieceList, piecePositions);
 	// Black Rook2
-	chessPiece blackRook2(63, boardWidth, boardHeight, 'R', 'b', pieceList, piecePositions);
+	chessPiece blackRook2(31, 5, 31, 63, boardWidth, boardHeight, 'R', 'b', livePieceList, piecePositions);
 
 	// Fill vector with the pieces we've initialised
-	pieceList = { whiteRook1, whiteKnight1, whiteBishop1, whiteQueen, whiteKing, whiteBishop2, whiteKnight2, whiteRook2, whitePawn1, whitePawn2, whitePawn3, whitePawn4, whitePawn5, whitePawn6, whitePawn7, whitePawn8, blackPawn1,blackPawn2, blackPawn3, blackPawn4, blackPawn5, blackPawn6, blackPawn7, blackPawn8, blackRook1, blackKnight1, blackBishop1, blackQueen, blackKing, blackBishop2, blackKnight2, blackRook2 };
+	livePieceList = { whiteRook1, whiteKnight1, whiteBishop1, whiteQueen, whiteKing, whiteBishop2, whiteKnight2, whiteRook2, whitePawn1, whitePawn2, whitePawn3, whitePawn4, whitePawn5, whitePawn6, whitePawn7, whitePawn8, blackPawn1,blackPawn2, blackPawn3, blackPawn4, blackPawn5, blackPawn6, blackPawn7, blackPawn8, blackRook1, blackKnight1, blackBishop1, blackQueen, blackKing, blackBishop2, blackKnight2, blackRook2 };
+	
+	// Vector of CAPTURED chesspieces (starts off empty)
+	std::vector<chessPiece> deadPieceList{};
+
 	#pragma endregion
 
 
@@ -1181,6 +1310,7 @@ int main()
 	// Generates Shader object using shaders basic.vert and basic.frag (this one has no textures)
 	Shader shaderProgram2("Resource Files/Shaders/basic.vert", "Resource Files/Shaders/basic.frag");
 	#pragma endregion
+
 
 	// CHESS BOARD AND PIECES VAO, VBO, EBO BINDING
 	#pragma region
@@ -1398,7 +1528,10 @@ int main()
 	linkingFunction(VAO33, VBO1, EBO33, bufferAttribNum, 3, 3, 2);
 
 	VBO1.Unbind();
-	VAO vaoArray[33]{ VAO1, VAO2, VAO3, VAO4, VAO5, VAO6, VAO7, VAO8, VAO9, VAO10, VAO11, VAO12, VAO13, VAO14, VAO15, VAO16, VAO17, VAO18, VAO19, VAO20, VAO21, VAO22, VAO23, VAO24, VAO25, VAO26, VAO27, VAO28, VAO29, VAO30, VAO31, VAO32, VAO33 };
+
+	std::vector<VAO> pieceVaoVec = { VAO2, VAO3, VAO4, VAO5, VAO6, VAO7, VAO8, VAO9, VAO10, VAO11, VAO12, VAO13, VAO14, VAO15, VAO16, VAO17, VAO18, VAO19, VAO20, VAO21, VAO22, VAO23, VAO24, VAO25, VAO26, VAO27, VAO28, VAO29, VAO30, VAO31, VAO32, VAO33 };
+
+	//VAO vaoArray[33]{ VAO1, VAO2, VAO3, VAO4, VAO5, VAO6, VAO7, VAO8, VAO9, VAO10, VAO11, VAO12, VAO13, VAO14, VAO15, VAO16, VAO17, VAO18, VAO19, VAO20, VAO21, VAO22, VAO23, VAO24, VAO25, VAO26, VAO27, VAO28, VAO29, VAO30, VAO31, VAO32, VAO33 };
 	#pragma endregion
 	
 
@@ -1441,8 +1574,14 @@ int main()
 	blackPawnTex.TexUnit(shaderProgram, "tex0", 1);
 
 
+	std::vector<Texture> pieceTextureVec = { whiteKingTex, blackKingTex, whiteQueenTex, blackQueenTex, whiteRookTex, blackRookTex, whiteBishopTex, blackBishopTex, whiteKnightTex, blackKnightTex, whitePawnTex, blackPawnTex };
+
+
+
 	Texture startGameTex("Resource Files/Textures/StartGame.png", GL_TEXTURE_2D, GL_TEXTURE1, GL_RGBA, GL_UNSIGNED_BYTE);
 	startGameTex.TexUnit(shaderProgram, "tex0", 1);
+
+	
 	#pragma endregion
 
 	
@@ -1557,8 +1696,8 @@ int main()
 
 
 
-	bool pieceClicked = FALSE;
-	int clickedPiece;
+	bool pieceClicked = FALSE; // Has a piece been clicked?
+	int clickedPiece;		   // What is the livePieceList order of the selected piece?
 	char players[] = { 'w', 'b' };
 	int playerTurn = 0;
 
@@ -1577,7 +1716,7 @@ int main()
 
 					// Remove moveSet highlights
 					#pragma region
-					std::vector<int> pieceMoveSet = pieceList[clickedPiece].getMoveSet();
+					std::vector<int> pieceMoveSet = livePieceList[clickedPiece].getMoveSet();
 					for (int e = 0; e < pieceMoveSet.size(); e++) {
 						vertices[bufferAttribNum * boardIndices[6 * pieceMoveSet[e] + 2] + 3] = 1.0f * float((boardIndices[6 * pieceMoveSet[e] + 2] + 1) % 2);  // R
 						vertices[bufferAttribNum * boardIndices[6 * pieceMoveSet[e] + 2] + 4] = 1.0f * float((boardIndices[6 * pieceMoveSet[e] + 2] + 1) % 2) + 0.894f * (1 - float((boardIndices[6 * pieceMoveSet[e] + 2] + 1) % 2));  // G
@@ -1611,15 +1750,42 @@ int main()
 								for (int q = 0; q < pieceMoveSet.size(); q++) {
 									if (j == pieceMoveSet[q]) { // if j is a square withing the piece's allowed moves
 
-										// how many indices to move the piece up
-										int up = (j - pieceList[clickedPiece].getPos() + pieceList[clickedPiece].getPos() % (boardWidth)-j % (boardWidth)) / boardWidth;
-										// how many indices to move the piece to the right
-										int right = (j - up * boardWidth) - pieceList[clickedPiece].getPos();
+										// CAPTURES
+										// check if another piece is already on the square and if so remove it
+										if (piecePositions[j] != -1) {
 
-										pieceList[clickedPiece].setPos(up, right, piecePositions);
-										vaoArray[clickedPiece + 1].Bind();  // this may cause me problems later: using 'clickedPiece' only works if the objects in pieceList are in the same order as their corresponding VAOs in vaoArray
-										EBO EBOtemp(squareIndices[pieceList[clickedPiece].getPos()], sizeof(squareIndices[pieceList[clickedPiece].getPos()]));
-										linkingFunction(vaoArray[clickedPiece + 1], VBO1, EBOtemp, bufferAttribNum, 3, 3, 2); // same problem as above, find a method that doesn't require the arrays to be in the same order
+											// Add piece to dead piece vector and update its order
+											int newOrder = deadPieceList.size();
+											deadPieceList.push_back(livePieceList[piecePositions[j]]);
+											deadPieceList[newOrder].setOrder(newOrder, piecePositions);
+
+											// Remove piece from live piece vector
+											std::vector<chessPiece>::iterator ptr;
+											ptr = livePieceList.begin();
+											advance(ptr, piecePositions[j]);
+											livePieceList.erase(ptr);
+
+											// Update order for all the pieces in live vector that came after the piece we just removed
+											for (int livePieceOrder = piecePositions[j]; livePieceOrder < (livePieceList.size() - 1); livePieceOrder++) {
+												livePieceList[livePieceOrder].setOrder(livePieceOrder, piecePositions);
+											}
+
+											// Move the (now dead) piece off the board - into the graveyard...
+											pieceVaoVec[deadPieceList[newOrder].getVaoOrder()].Bind();  // bind the correct vao
+											EBO EBOtemp(graveyardIndices[newOrder], sizeof(graveyardIndices[newOrder]));
+											linkingFunction(pieceVaoVec[newOrder], VBO1, EBOtemp, bufferAttribNum, 3, 3, 2);
+
+										}
+										
+										// how many indices to move the piece up
+										int up = (j - livePieceList[clickedPiece].getPos() + livePieceList[clickedPiece].getPos() % (boardWidth)-j % (boardWidth)) / boardWidth;
+										// how many indices to move the piece to the right
+										int right = (j - up * boardWidth) - livePieceList[clickedPiece].getPos();
+
+										livePieceList[clickedPiece].setPos(up, right, piecePositions); // set new piece position
+										pieceVaoVec[livePieceList[clickedPiece].getVaoOrder()].Bind();  // bind the correct vao
+										EBO EBOtemp(squareIndices[livePieceList[clickedPiece].getPos()], sizeof(squareIndices[livePieceList[clickedPiece].getPos()])); 
+										linkingFunction(pieceVaoVec[livePieceList[clickedPiece].getVaoOrder()], VBO1, EBOtemp, bufferAttribNum, 3, 3, 2); 
 										
 
 										// Update who's turn it is. This code is generalised in case I want to play with more than two players
@@ -1647,18 +1813,18 @@ int main()
 				float y = (windowHeight - 2 * float(ycursorpos)) / windowHeight;
 
 
-				for (int i = 0; i < 32; i++) { // go through all the pieces and check if the mouse pos match the piece pos
-					int ind1 = squareIndices[pieceList[i].getPos()][0]; // each square has 6 indices, the first one corresponds to the bottom left corner of the square
-					int ind2 = squareIndices[pieceList[i].getPos()][1]; // top right corner
+				for (int i = 0; i < livePieceList.size(); i++) { // go through all the pieces and check if the mouse pos match the piece pos
+					int ind1 = squareIndices[livePieceList[i].getPos()][0]; // each square has 6 indices, the first one corresponds to the bottom left corner of the square
+					int ind2 = squareIndices[livePieceList[i].getPos()][1]; // top right corner
 					if ((x > vertices[bufferAttribNum * ind1]) && ((x < vertices[bufferAttribNum * ind2]))) // if the mouse xPos is within the x value of the bottom left corner and the top right corner
 					{
 						if ((y > vertices[bufferAttribNum * ind1 + 1]) && ((y < vertices[bufferAttribNum * ind2 + 1]))) // if the mouse yPos is within the y value of the bottom left corner and the top right corner
 						{
-							//then pieceList[i] is the piece being clicked on
-							
+							//then livePieceList[i] is the piece being clicked on
+							clickedPiece = i;
 
 							// if we clicked on the wrong colour then break from the loop and try again
-							if (pieceList[i].getColour() != players[playerTurn]) {
+							if (livePieceList[i].getColour() != players[playerTurn]) {
 								break;
 							}
 							
@@ -1666,8 +1832,8 @@ int main()
 							pieceClicked = TRUE;
 							
 							// update and get moveset
-							pieceList[i].setMoveSet(piecePositions);
-							std::vector<int> pieceMoveSet = pieceList[i].getMoveSet();
+							livePieceList[i].setMoveSet(piecePositions, livePieceList);
+							std::vector<int> pieceMoveSet = livePieceList[i].getMoveSet();
 
 							// Highlight the squares that are in the moveSet of the clicked piece
 							#pragma region
@@ -1687,7 +1853,7 @@ int main()
 							VBOtemp.Delete();
 							#pragma endregion
 
-							clickedPiece = i;
+							
 							break;
 						}
 					}
@@ -1721,13 +1887,23 @@ int main()
 		// Using different shader program now (this one does textures)
 		shaderProgram.Activate();
 
-		
+
+		// DRAW PIECES
+
+		for (int order = 0; order < livePieceList.size(); order++) {
+			pieceTextureVec[livePieceList[order].getTexOrder()].Bind(); // Binds texture so that it appears in rendering
+			pieceVaoVec[livePieceList[order].getVaoOrder()].Bind();
+			glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, (void*)0);
+		}
+
+		/*
 		// DRAW WHITE ROOK1
 		// Binds texture so that it appears in rendering
 		whiteRookTex.Bind();
 		VAO2.Bind();
 		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, (void*)0);
 
+		
 		// DRAW WHITE KNIGHT1
 		whiteKnightTex.Bind();
 		VAO3.Bind();
@@ -1882,6 +2058,11 @@ int main()
 		blackRookTex.Bind();
 		VAO33.Bind();
 		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, (void*)0);
+
+
+		*/
+
+
 
 		// Swap the back buffer with the front buffer
 		glfwSwapBuffers(window);
