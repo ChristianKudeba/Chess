@@ -1003,9 +1003,16 @@ public:
 		}
 	}
 
-	void setOrder(int listOrder, std::vector<int>& postionArray) {
-		pieceOrder = listOrder;
+	void setOrder(int newPieceOrder, int newVaoOrder, std::vector<int>& postionArray) {
+		pieceOrder = newPieceOrder;
 		postionArray[ind] = pieceOrder;
+		vaoOrder = newVaoOrder;
+	}
+
+	void setGraveOrder(int newPieceOrder, int newVaoOrder, std::vector<int>& postionArray)
+	{
+		ind = newPieceOrder;
+		setOrder(newPieceOrder, newVaoOrder, postionArray);
 	}
 
 	std::vector<int> getScope()
@@ -1035,30 +1042,6 @@ public:
 	{
 		return pieceColour;
 	}
-
-
-	/*
-	void getCaptured(std::vector<chessPiece> listOfLivingPieces, std::vector<chessPiece> listOfDeadPieces, int livingListIndex) {
-		
-		// Add piece to dead piece vector and update its order
-		int newOrder = listOfDeadPieces.size() - 1;
-		listOfDeadPieces.push_back(listOfLivingPieces[livingListIndex]);
-		listOfDeadPieces[newOrder].setOrder(newOrder);
-
-		// Remove piece from live piece vector
-		std::vector<chessPiece>::iterator ptr;
-		ptr = listOfLivingPieces.begin();
-		advance(ptr, livingListIndex);
-		listOfLivingPieces.erase(ptr);
-
-		// Update order for all the pieces in live vector that came after the piece we just removed
-		for (int i = livingListIndex; i < (listOfLivingPieces.size() - 1); i++) {
-			listOfLivingPieces[i].setOrder(i);
-		}
-
-		// Move the (now dead) piece off the board - into the graveyard...
-	}
-	*/
 
 };
 
@@ -1155,7 +1138,7 @@ int main()
 	for (int i = 0; i < 2; ++i) { // columns
 		for (int j = 0; j < (boardWidth + 1); ++j) { // rows
 			graveyardVertices[(bufferAttribNum * ((boardWidth + 1) * i + j))] = 0.1f * float(j - boardWidth / 2); // xPos
-			graveyardVertices[(bufferAttribNum * ((boardWidth + 1) * i + j)) + 1] = 0.1f * float(i + 5 + boardHeight / 2); // yPos
+			graveyardVertices[(bufferAttribNum * ((boardWidth + 1) * i + j)) + 1] = 0.1f * float((i + 1 + boardHeight) / 2); // yPos
 			graveyardVertices[(bufferAttribNum * ((boardWidth + 1) * i + j)) + 2] = 0.0f;  // zPos
 			graveyardVertices[(bufferAttribNum * ((boardWidth + 1) * i + j)) + 3] = 0.0f;  // R
 			graveyardVertices[(bufferAttribNum * ((boardWidth + 1) * i + j)) + 4] = 0.0f;  // G
@@ -1166,6 +1149,7 @@ int main()
 	}
 
 	// GRAVEYARD indices
+	GLuint testIndices[6 * 2 * boardWidth]{};// delete this
 	GLuint graveyardIndices[2 * boardWidth][6]{};
 	n = 0;
 	for (int m = 0; m < (2 * boardWidth); ++m)
@@ -1175,6 +1159,13 @@ int main()
 			n++;
 		}
 
+		// testIndices are used to display the graveyard DELETE THIS
+		testIndices[6 * m] = m + n + boardWidth + 2;
+		testIndices[6 * m + 1] = m + n + boardWidth + 1;
+		testIndices[6 * m + 2] = m + n;
+		testIndices[6 * m + 3] = m + n + boardWidth + 2;
+		testIndices[6 * m + 4] = m + n + 1;
+		testIndices[6 * m + 5] = m + n;
 
 		// graveyardIndices are used to determine the placement of pieces when they die
 		graveyardIndices[m][0] = m + n;
@@ -1190,12 +1181,9 @@ int main()
 	// Vector of ints indicating which piece is on each square
 	// the purpose of this is so we don't have to loop through pieceList to 
 	// check what piece (if any) is on a particular square
-	std::vector<int> piecePositions(boardHeight * boardWidth, -1);
+	std::vector<int> livePiecePositions(boardHeight * boardWidth, -1);
 	
-	//int piecePositions[boardHeight * boardWidth];
-	//for (int z = 1; z < (boardHeight * boardWidth); z++) {
-	//	piecePositions[z] = NULL;
-	//}
+	std::vector<int> deadPiecePositions(boardWidth, -1);
 
 
 	#pragma endregion
@@ -1208,69 +1196,69 @@ int main()
 	std::vector<chessPiece> livePieceList{};
 
 	// White Rook1
-	chessPiece whiteRook1(0, 4, 0, 0, boardWidth, boardHeight, 'R', 'w', livePieceList, piecePositions);
+	chessPiece whiteRook1(0, 4, 0, 0, boardWidth, boardHeight, 'R', 'w', livePieceList, livePiecePositions);
 	// White Knight1
-	chessPiece whiteKnight1(1, 8, 1, 1, boardWidth, boardHeight, 'N', 'w', livePieceList, piecePositions);
+	chessPiece whiteKnight1(1, 8, 1, 1, boardWidth, boardHeight, 'N', 'w', livePieceList, livePiecePositions);
 	// White Bishop1
-	chessPiece whiteBishop1(2, 6, 2, 2, boardWidth, boardHeight, 'B', 'w', livePieceList, piecePositions);
+	chessPiece whiteBishop1(2, 6, 2, 2, boardWidth, boardHeight, 'B', 'w', livePieceList, livePiecePositions);
 	// White Queen
-	chessPiece whiteQueen(3, 2, 3, 3, boardWidth, boardHeight, 'Q', 'w', livePieceList, piecePositions);
+	chessPiece whiteQueen(3, 2, 3, 3, boardWidth, boardHeight, 'Q', 'w', livePieceList, livePiecePositions);
 	// White King
-	chessPiece whiteKing(4, 0, 4, 4, boardWidth, boardHeight, 'K', 'w', livePieceList, piecePositions);
+	chessPiece whiteKing(4, 0, 4, 4, boardWidth, boardHeight, 'K', 'w', livePieceList, livePiecePositions);
 	// White Bishop2
-	chessPiece whiteBishop2(5, 6, 5, 5, boardWidth, boardHeight, 'B', 'w', livePieceList, piecePositions);
+	chessPiece whiteBishop2(5, 6, 5, 5, boardWidth, boardHeight, 'B', 'w', livePieceList, livePiecePositions);
 	// White Knight2
-	chessPiece whiteKnight2(6, 8, 6, 6, boardWidth, boardHeight, 'N', 'w', livePieceList, piecePositions);
+	chessPiece whiteKnight2(6, 8, 6, 6, boardWidth, boardHeight, 'N', 'w', livePieceList, livePiecePositions);
 	// White Rook2
-	chessPiece whiteRook2(7, 4, 7, 7, boardWidth, boardHeight, 'R', 'w', livePieceList, piecePositions);
+	chessPiece whiteRook2(7, 4, 7, 7, boardWidth, boardHeight, 'R', 'w', livePieceList, livePiecePositions);
 	// White Pawn1
-	chessPiece whitePawn1(8, 10, 8, 8, boardWidth, boardHeight, 'P', 'w', livePieceList, piecePositions);
+	chessPiece whitePawn1(8, 10, 8, 8, boardWidth, boardHeight, 'P', 'w', livePieceList, livePiecePositions);
 	// White Pawn2
-	chessPiece whitePawn2(9, 10, 9, 9, boardWidth, boardHeight, 'P', 'w', livePieceList, piecePositions);
+	chessPiece whitePawn2(9, 10, 9, 9, boardWidth, boardHeight, 'P', 'w', livePieceList, livePiecePositions);
 	// White Pawn3
-	chessPiece whitePawn3(10, 10, 10, 10, boardWidth, boardHeight, 'P', 'w', livePieceList, piecePositions);
+	chessPiece whitePawn3(10, 10, 10, 10, boardWidth, boardHeight, 'P', 'w', livePieceList, livePiecePositions);
 	// White Pawn4
-	chessPiece whitePawn4(11, 10, 11, 11, boardWidth, boardHeight, 'P', 'w', livePieceList, piecePositions);
+	chessPiece whitePawn4(11, 10, 11, 11, boardWidth, boardHeight, 'P', 'w', livePieceList, livePiecePositions);
 	// White Pawn5
-	chessPiece whitePawn5(12, 10, 12, 12, boardWidth, boardHeight, 'P', 'w', livePieceList, piecePositions);
+	chessPiece whitePawn5(12, 10, 12, 12, boardWidth, boardHeight, 'P', 'w', livePieceList, livePiecePositions);
 	// White Pawn6
-	chessPiece whitePawn6(13, 10, 13, 13, boardWidth, boardHeight, 'P', 'w', livePieceList, piecePositions);
+	chessPiece whitePawn6(13, 10, 13, 13, boardWidth, boardHeight, 'P', 'w', livePieceList, livePiecePositions);
 	// White Pawn7
-	chessPiece whitePawn7(14, 10, 14, 14, boardWidth, boardHeight, 'P', 'w', livePieceList, piecePositions);
+	chessPiece whitePawn7(14, 10, 14, 14, boardWidth, boardHeight, 'P', 'w', livePieceList, livePiecePositions);
 	// White Pawn8
-	chessPiece whitePawn8(15, 10, 15, 15, boardWidth, boardHeight, 'P', 'w', livePieceList, piecePositions);
+	chessPiece whitePawn8(15, 10, 15, 15, boardWidth, boardHeight, 'P', 'w', livePieceList, livePiecePositions);
 	// Black Pawn1
-	chessPiece blackPawn1(16, 11, 16, 48, boardWidth, boardHeight, 'P', 'b', livePieceList, piecePositions);
+	chessPiece blackPawn1(16, 11, 16, 48, boardWidth, boardHeight, 'P', 'b', livePieceList, livePiecePositions);
 	// Black Pawn2
-	chessPiece blackPawn2(17, 11, 17, 49, boardWidth, boardHeight, 'P', 'b', livePieceList, piecePositions);
+	chessPiece blackPawn2(17, 11, 17, 49, boardWidth, boardHeight, 'P', 'b', livePieceList, livePiecePositions);
 	// Black Pawn3
-	chessPiece blackPawn3(18, 11, 18, 50, boardWidth, boardHeight, 'P', 'b', livePieceList, piecePositions);
+	chessPiece blackPawn3(18, 11, 18, 50, boardWidth, boardHeight, 'P', 'b', livePieceList, livePiecePositions);
 	// Black Pawn4
-	chessPiece blackPawn4(19, 11, 19, 51, boardWidth, boardHeight, 'P', 'b', livePieceList, piecePositions);
+	chessPiece blackPawn4(19, 11, 19, 51, boardWidth, boardHeight, 'P', 'b', livePieceList, livePiecePositions);
 	// Black Pawn5
-	chessPiece blackPawn5(20, 11, 20, 52, boardWidth, boardHeight, 'P', 'b', livePieceList, piecePositions);
+	chessPiece blackPawn5(20, 11, 20, 52, boardWidth, boardHeight, 'P', 'b', livePieceList, livePiecePositions);
 	// Black Pawn6
-	chessPiece blackPawn6(21, 11, 21, 53, boardWidth, boardHeight, 'P', 'b', livePieceList, piecePositions);
+	chessPiece blackPawn6(21, 11, 21, 53, boardWidth, boardHeight, 'P', 'b', livePieceList, livePiecePositions);
 	// Black Pawn7
-	chessPiece blackPawn7(22, 11, 22, 54, boardWidth, boardHeight, 'P', 'b', livePieceList, piecePositions);
+	chessPiece blackPawn7(22, 11, 22, 54, boardWidth, boardHeight, 'P', 'b', livePieceList, livePiecePositions);
 	// Black Pawn8
-	chessPiece blackPawn8(23, 11, 23, 55, boardWidth, boardHeight, 'P', 'b', livePieceList, piecePositions);
+	chessPiece blackPawn8(23, 11, 23, 55, boardWidth, boardHeight, 'P', 'b', livePieceList, livePiecePositions);
 	// Black Rook1
-	chessPiece blackRook1(24, 5, 24, 56, boardWidth, boardHeight, 'R', 'b', livePieceList, piecePositions);
+	chessPiece blackRook1(24, 5, 24, 56, boardWidth, boardHeight, 'R', 'b', livePieceList, livePiecePositions);
 	// Black Knight1
-	chessPiece blackKnight1(25, 9, 25, 57, boardWidth, boardHeight, 'N', 'b', livePieceList, piecePositions);
+	chessPiece blackKnight1(25, 9, 25, 57, boardWidth, boardHeight, 'N', 'b', livePieceList, livePiecePositions);
 	// Black Bishop1
-	chessPiece blackBishop1(26, 7, 26, 58, boardWidth, boardHeight, 'B', 'b', livePieceList, piecePositions);
+	chessPiece blackBishop1(26, 7, 26, 58, boardWidth, boardHeight, 'B', 'b', livePieceList, livePiecePositions);
 	// Black Queen
-	chessPiece blackQueen(27, 3, 27, 59, boardWidth, boardHeight, 'Q', 'b', livePieceList, piecePositions);
+	chessPiece blackQueen(27, 3, 27, 59, boardWidth, boardHeight, 'Q', 'b', livePieceList, livePiecePositions);
 	// Black King
-	chessPiece blackKing(28, 1, 28, 60, boardWidth, boardHeight, 'K', 'b', livePieceList, piecePositions);
+	chessPiece blackKing(28, 1, 28, 60, boardWidth, boardHeight, 'K', 'b', livePieceList, livePiecePositions);
 	// Black Bishop2
-	chessPiece blackBishop2(29, 7, 29, 61, boardWidth, boardHeight, 'B', 'b', livePieceList, piecePositions);
+	chessPiece blackBishop2(29, 7, 29, 61, boardWidth, boardHeight, 'B', 'b', livePieceList, livePiecePositions);
 	// Black Knight2
-	chessPiece blackKnight2(30, 9, 30, 62, boardWidth, boardHeight, 'N', 'b', livePieceList, piecePositions);
+	chessPiece blackKnight2(30, 9, 30, 62, boardWidth, boardHeight, 'N', 'b', livePieceList, livePiecePositions);
 	// Black Rook2
-	chessPiece blackRook2(31, 5, 31, 63, boardWidth, boardHeight, 'R', 'b', livePieceList, piecePositions);
+	chessPiece blackRook2(31, 5, 31, 63, boardWidth, boardHeight, 'R', 'b', livePieceList, livePiecePositions);
 
 	// Fill vector with the pieces we've initialised
 	livePieceList = { whiteRook1, whiteKnight1, whiteBishop1, whiteQueen, whiteKing, whiteBishop2, whiteKnight2, whiteRook2, whitePawn1, whitePawn2, whitePawn3, whitePawn4, whitePawn5, whitePawn6, whitePawn7, whitePawn8, blackPawn1,blackPawn2, blackPawn3, blackPawn4, blackPawn5, blackPawn6, blackPawn7, blackPawn8, blackRook1, blackKnight1, blackBishop1, blackQueen, blackKing, blackBishop2, blackKnight2, blackRook2 };
@@ -1314,6 +1302,31 @@ int main()
 
 	// CHESS BOARD AND PIECES VAO, VBO, EBO BINDING
 	#pragma region
+
+	// TEST DELETE THIS
+
+	VAO VAOtest;
+	VAOtest.Bind();
+	VBO VBOtest(graveyardVertices, sizeof(graveyardVertices));
+	// Generates Element Buffer Object and links it to indices
+	EBO EBOtest(testIndices, sizeof(testIndices));
+	// Links VBO attributes such as coordinates and colours and textures to VAO
+	VAOtest.LinkAttrib(VBOtest, 0, 3, GL_FLOAT, bufferAttribNum * sizeof(float), (void*)0);
+	VAOtest.LinkAttrib(VBOtest, 1, 3, GL_FLOAT, bufferAttribNum * sizeof(float), (void*)(3 * sizeof(float)));
+	VAOtest.LinkAttrib(VBOtest, 2, 2, GL_FLOAT, bufferAttribNum * sizeof(float), (void*)(6 * sizeof(float)));
+	// Unbind all to prevent accidentally modyfying them 
+	VAOtest.Unbind();
+	VBOtest.Unbind();
+	EBOtest.Delete();
+
+
+
+	//TEST
+
+
+
+
+
 	// Generates Vertex Array Object and binds it
 	VAO VAO1;
 	VAO1.Bind();
@@ -1529,9 +1542,10 @@ int main()
 
 	VBO1.Unbind();
 
-	std::vector<VAO> pieceVaoVec = { VAO2, VAO3, VAO4, VAO5, VAO6, VAO7, VAO8, VAO9, VAO10, VAO11, VAO12, VAO13, VAO14, VAO15, VAO16, VAO17, VAO18, VAO19, VAO20, VAO21, VAO22, VAO23, VAO24, VAO25, VAO26, VAO27, VAO28, VAO29, VAO30, VAO31, VAO32, VAO33 };
+	std::vector<VAO> livePieceVaoVec = { VAO2, VAO3, VAO4, VAO5, VAO6, VAO7, VAO8, VAO9, VAO10, VAO11, VAO12, VAO13, VAO14, VAO15, VAO16, VAO17, VAO18, VAO19, VAO20, VAO21, VAO22, VAO23, VAO24, VAO25, VAO26, VAO27, VAO28, VAO29, VAO30, VAO31, VAO32, VAO33 };
 
-	//VAO vaoArray[33]{ VAO1, VAO2, VAO3, VAO4, VAO5, VAO6, VAO7, VAO8, VAO9, VAO10, VAO11, VAO12, VAO13, VAO14, VAO15, VAO16, VAO17, VAO18, VAO19, VAO20, VAO21, VAO22, VAO23, VAO24, VAO25, VAO26, VAO27, VAO28, VAO29, VAO30, VAO31, VAO32, VAO33 };
+	std::vector<VAO> deadPieceVaoVec = { };
+
 	#pragma endregion
 	
 
@@ -1752,28 +1766,47 @@ int main()
 
 										// CAPTURES
 										// check if another piece is already on the square and if so remove it
-										if (piecePositions[j] != -1) {
+										if (livePiecePositions[j] != -1) {
 
-											// Add piece to dead piece vector and update its order
+											// Add piece to dead piece vector
 											int newOrder = deadPieceList.size();
-											deadPieceList.push_back(livePieceList[piecePositions[j]]);
-											deadPieceList[newOrder].setOrder(newOrder, piecePositions);
+											deadPieceList.push_back(livePieceList[livePiecePositions[j]]);
+											
 
-											// Remove piece from live piece vector
+
+											// Remove piece from live piece vector and remove the piece's VAO from livePieceVaoVec
 											std::vector<chessPiece>::iterator ptr;
 											ptr = livePieceList.begin();
-											advance(ptr, piecePositions[j]);
-											livePieceList.erase(ptr);
+											advance(ptr, livePiecePositions[j]);
 
-											// Update order for all the pieces in live vector that came after the piece we just removed
-											for (int livePieceOrder = piecePositions[j]; livePieceOrder < (livePieceList.size() - 1); livePieceOrder++) {
-												livePieceList[livePieceOrder].setOrder(livePieceOrder, piecePositions);
+											std::vector<VAO>::iterator ptr2;
+											ptr2 = livePieceVaoVec.begin();
+											advance(ptr2, livePiecePositions[j]);
+
+											livePieceList.erase(ptr);
+											livePieceVaoVec.erase(ptr2);
+
+
+											// Update order for all the pieces in live piece vector that came after the piece we just removed
+											for (int livePieceOrder = livePiecePositions[j]; livePieceOrder < livePieceList.size(); livePieceOrder++) {											
+												int newVaoOrder = livePieceList[livePieceOrder].getVaoOrder() - 1;
+												livePieceList[livePieceOrder].setOrder(livePieceOrder, newVaoOrder, livePiecePositions); // set order also updates livePiecePositions and vaoOrder
 											}
 
-											// Move the (now dead) piece off the board - into the graveyard...
-											pieceVaoVec[deadPieceList[newOrder].getVaoOrder()].Bind();  // bind the correct vao
-											EBO EBOtemp(graveyardIndices[newOrder], sizeof(graveyardIndices[newOrder]));
-											linkingFunction(pieceVaoVec[newOrder], VBO1, EBOtemp, bufferAttribNum, 3, 3, 2);
+
+											// Give the piece a new VAO
+											
+											VAO VAOdead;
+											VAOdead.Bind();
+											EBO EBOdead(graveyardIndices[newOrder], sizeof(graveyardIndices[newOrder]));
+											linkingFunction(VAOdead, VBOtest, EBOdead, bufferAttribNum, 3, 3, 2);
+											int newDeadVaoOrder = deadPieceVaoVec.size();
+											deadPieceVaoVec.push_back(VAOdead);
+
+
+
+											// Update the dead piece's order
+											deadPieceList[newOrder].setGraveOrder(newOrder, newDeadVaoOrder, deadPiecePositions);
 
 										}
 										
@@ -1782,10 +1815,10 @@ int main()
 										// how many indices to move the piece to the right
 										int right = (j - up * boardWidth) - livePieceList[clickedPiece].getPos();
 
-										livePieceList[clickedPiece].setPos(up, right, piecePositions); // set new piece position
-										pieceVaoVec[livePieceList[clickedPiece].getVaoOrder()].Bind();  // bind the correct vao
+										livePieceList[clickedPiece].setPos(up, right, livePiecePositions); // set new piece position
+										livePieceVaoVec[livePieceList[clickedPiece].getVaoOrder()].Bind();  // bind the correct vao
 										EBO EBOtemp(squareIndices[livePieceList[clickedPiece].getPos()], sizeof(squareIndices[livePieceList[clickedPiece].getPos()])); 
-										linkingFunction(pieceVaoVec[livePieceList[clickedPiece].getVaoOrder()], VBO1, EBOtemp, bufferAttribNum, 3, 3, 2); 
+										linkingFunction(livePieceVaoVec[livePieceList[clickedPiece].getVaoOrder()], VBO1, EBOtemp, bufferAttribNum, 3, 3, 2); 
 										
 
 										// Update who's turn it is. This code is generalised in case I want to play with more than two players
@@ -1832,7 +1865,7 @@ int main()
 							pieceClicked = TRUE;
 							
 							// update and get moveset
-							livePieceList[i].setMoveSet(piecePositions, livePieceList);
+							livePieceList[i].setMoveSet(livePiecePositions, livePieceList);
 							std::vector<int> pieceMoveSet = livePieceList[i].getMoveSet();
 
 							// Highlight the squares that are in the moveSet of the clicked piece
@@ -1883,7 +1916,17 @@ int main()
 		//Draw the triangle using the GL_TRIANGLES primitive
 		glDrawElements(GL_TRIANGLES, 6 * (boardHeight * boardWidth), GL_UNSIGNED_INT, (void*)0);
 		
+
+
+
+		// TEST To observe graveyard please delete
+		//VAOtest.Bind();
+		//glDrawElements(GL_TRIANGLES, 6 * boardWidth, GL_UNSIGNED_INT, (void*)0);
 		
+
+
+
+
 		// Using different shader program now (this one does textures)
 		shaderProgram.Activate();
 
@@ -1892,9 +1935,18 @@ int main()
 
 		for (int order = 0; order < livePieceList.size(); order++) {
 			pieceTextureVec[livePieceList[order].getTexOrder()].Bind(); // Binds texture so that it appears in rendering
-			pieceVaoVec[livePieceList[order].getVaoOrder()].Bind();
+			livePieceVaoVec[livePieceList[order].getVaoOrder()].Bind();
 			glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, (void*)0);
 		}
+
+
+		// Graveyard pieces
+		for (int order = 0; order < deadPieceList.size(); order++) {
+			pieceTextureVec[deadPieceList[order].getTexOrder()].Bind(); // Binds texture so that it appears in rendering
+			deadPieceVaoVec[deadPieceList[order].getVaoOrder()].Bind();
+			glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, (void*)0);
+		}
+
 
 		/*
 		// DRAW WHITE ROOK1
