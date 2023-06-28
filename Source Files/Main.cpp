@@ -1768,11 +1768,13 @@ int main()
 										// check if another piece is already on the square and if so remove it
 										if (livePiecePositions[j] != -1) {
 
+											int victimPieceOrder = livePiecePositions[j];
+											
+											
 											// Add piece to dead piece vector
 											int newOrder = deadPieceList.size();
 											deadPieceList.push_back(livePieceList[livePiecePositions[j]]);
 											
-
 
 											// Remove piece from live piece vector and remove the piece's VAO from livePieceVaoVec
 											std::vector<chessPiece>::iterator ptr;
@@ -1793,6 +1795,7 @@ int main()
 												livePieceList[livePieceOrder].setOrder(livePieceOrder, newVaoOrder, livePiecePositions); // set order also updates livePiecePositions and vaoOrder
 											}
 
+											if (clickedPiece > victimPieceOrder) { clickedPiece--; }  // Make sure we select the right piece to move after updating livePieceList
 
 											// Give the piece a new VAO
 											
@@ -1940,7 +1943,7 @@ int main()
 		}
 
 
-		// Graveyard pieces
+		// Draw Graveyard pieces
 		for (int order = 0; order < deadPieceList.size(); order++) {
 			pieceTextureVec[deadPieceList[order].getTexOrder()].Bind(); // Binds texture so that it appears in rendering
 			deadPieceVaoVec[deadPieceList[order].getVaoOrder()].Bind();
