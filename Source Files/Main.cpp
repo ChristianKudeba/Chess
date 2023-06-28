@@ -1009,10 +1009,13 @@ public:
 		vaoOrder = newVaoOrder;
 	}
 
-	void setGraveOrder(int newPieceOrder, int newVaoOrder, std::vector<int>& postionArray)
+	void setGraveOrder(int newPosition, int newPieceOrder, int newVaoOrder, std::vector<int>& postionArray)
 	{
-		ind = newPieceOrder;
-		setOrder(newPieceOrder, newVaoOrder, postionArray);
+		ind = newPosition;
+		pieceOrder = newPieceOrder;
+		postionArray.push_back(newPosition);
+		//postionArray[ind] = pieceOrder;
+		vaoOrder = newVaoOrder;
 	}
 
 	std::vector<int> getScope()
@@ -1069,6 +1072,7 @@ int main()
 	int const boardHeight = 8;
 	int const boardWidth = 8;
 	int const bufferAttribNum = 8;
+	int const piecesPerSide = 16;
 	#pragma endregion
 	
 	
@@ -1086,6 +1090,9 @@ int main()
 
 
 	// CHESS BOARD VERTICES AND INDICES
+	#pragma region
+
+	// BOARD
 	#pragma region
 	// Sets the board vertices
 	GLfloat vertices[bufferAttribNum * (boardHeight + 1) * (boardWidth + 1)]{};
@@ -1131,24 +1138,43 @@ int main()
 		squareIndices[m][5] = m + n + 1;
 	};
 
+	#pragma endregion
 
-
-	// GRAVEYARD vertices
-	GLfloat graveyardVertices[bufferAttribNum * 2 * (boardWidth + 1)]{};
+	// GRAVEYARD
+	#pragma region
+	
+	// BLACK graveyard vertices
+	GLfloat blackGraveyardVertices[bufferAttribNum * 2 * (boardWidth + 1)]{};
 	for (int i = 0; i < 2; ++i) { // columns
 		for (int j = 0; j < (boardWidth + 1); ++j) { // rows
-			graveyardVertices[(bufferAttribNum * ((boardWidth + 1) * i + j))] = 0.1f * float(j - boardWidth / 2); // xPos
-			graveyardVertices[(bufferAttribNum * ((boardWidth + 1) * i + j)) + 1] = 0.1f * float((i + 1 + boardHeight) / 2); // yPos
-			graveyardVertices[(bufferAttribNum * ((boardWidth + 1) * i + j)) + 2] = 0.0f;  // zPos
-			graveyardVertices[(bufferAttribNum * ((boardWidth + 1) * i + j)) + 3] = 0.0f;  // R
-			graveyardVertices[(bufferAttribNum * ((boardWidth + 1) * i + j)) + 4] = 0.0f;  // G
-			graveyardVertices[(bufferAttribNum * ((boardWidth + 1) * i + j)) + 5] = 0.0f;  // B
-			graveyardVertices[(bufferAttribNum * ((boardWidth + 1) * i + j)) + 6] = float(j);  // Texture xCoord
-			graveyardVertices[(bufferAttribNum * ((boardWidth + 1) * i + j)) + 7] = float(i);  // Texture yCoord
+			blackGraveyardVertices[(bufferAttribNum * ((boardWidth + 1) * i + j))] = 0.1f * float(j*0.5 - boardWidth / 2); // xPos
+			blackGraveyardVertices[(bufferAttribNum * ((boardWidth + 1) * i + j)) + 1] = 0.1f * float((i*0.75 + boardHeight) / 2); // yPos
+			blackGraveyardVertices[(bufferAttribNum * ((boardWidth + 1) * i + j)) + 2] = 0.0f;  // zPos
+			blackGraveyardVertices[(bufferAttribNum * ((boardWidth + 1) * i + j)) + 3] = 0.0f;  // R
+			blackGraveyardVertices[(bufferAttribNum * ((boardWidth + 1) * i + j)) + 4] = 0.0f;  // G
+			blackGraveyardVertices[(bufferAttribNum * ((boardWidth + 1) * i + j)) + 5] = 0.0f;  // B
+			blackGraveyardVertices[(bufferAttribNum * ((boardWidth + 1) * i + j)) + 6] = float(j);  // Texture xCoord
+			blackGraveyardVertices[(bufferAttribNum * ((boardWidth + 1) * i + j)) + 7] = float(i);  // Texture yCoord
 		}
 	}
 
-	// GRAVEYARD indices
+
+	// WHITE graveyard vertices
+	GLfloat whiteGraveyardVertices[bufferAttribNum * 2 * (boardWidth + 1)]{};
+	for (int i = 0; i < 2; ++i) { // columns
+		for (int j = 0; j < (boardWidth + 1); ++j) { // rows
+			whiteGraveyardVertices[(bufferAttribNum * ((boardWidth + 1) * i + j))] = 0.1f * float(j * 0.5 - boardWidth / 2); // xPos
+			whiteGraveyardVertices[(bufferAttribNum * ((boardWidth + 1) * i + j)) + 1] = -0.1f * float((i * 0.75 + boardHeight) / 2); // yPos
+			whiteGraveyardVertices[(bufferAttribNum * ((boardWidth + 1) * i + j)) + 2] = 0.0f;  // zPos
+			whiteGraveyardVertices[(bufferAttribNum * ((boardWidth + 1) * i + j)) + 3] = 0.0f;  // R
+			whiteGraveyardVertices[(bufferAttribNum * ((boardWidth + 1) * i + j)) + 4] = 0.0f;  // G
+			whiteGraveyardVertices[(bufferAttribNum * ((boardWidth + 1) * i + j)) + 5] = 0.0f;  // B
+			whiteGraveyardVertices[(bufferAttribNum * ((boardWidth + 1) * i + j)) + 6] = float(j);  // Texture xCoord
+			whiteGraveyardVertices[(bufferAttribNum * ((boardWidth + 1) * i + j)) + 7] = float(i);  // Texture yCoord
+		}
+	}
+
+	// graveyard indices
 	GLuint testIndices[6 * 2 * boardWidth]{};// delete this
 	GLuint graveyardIndices[2 * boardWidth][6]{};
 	n = 0;
@@ -1175,7 +1201,7 @@ int main()
 		graveyardIndices[m][4] = m + n + boardWidth + 2;
 		graveyardIndices[m][5] = m + n + 1;
 	};
-
+	#pragma endregion
 
 
 	// Vector of ints indicating which piece is on each square
@@ -1183,7 +1209,9 @@ int main()
 	// check what piece (if any) is on a particular square
 	std::vector<int> livePiecePositions(boardHeight * boardWidth, -1);
 	
-	std::vector<int> deadPiecePositions(boardWidth, -1);
+	std::vector<int> whiteGraveyardPositions;
+
+	std::vector<int> blackGraveyardPositions;
 
 
 	#pragma endregion
@@ -1302,31 +1330,7 @@ int main()
 
 	// CHESS BOARD AND PIECES VAO, VBO, EBO BINDING
 	#pragma region
-
-	// TEST DELETE THIS
-
-	VAO VAOtest;
-	VAOtest.Bind();
-	VBO VBOtest(graveyardVertices, sizeof(graveyardVertices));
-	// Generates Element Buffer Object and links it to indices
-	EBO EBOtest(testIndices, sizeof(testIndices));
-	// Links VBO attributes such as coordinates and colours and textures to VAO
-	VAOtest.LinkAttrib(VBOtest, 0, 3, GL_FLOAT, bufferAttribNum * sizeof(float), (void*)0);
-	VAOtest.LinkAttrib(VBOtest, 1, 3, GL_FLOAT, bufferAttribNum * sizeof(float), (void*)(3 * sizeof(float)));
-	VAOtest.LinkAttrib(VBOtest, 2, 2, GL_FLOAT, bufferAttribNum * sizeof(float), (void*)(6 * sizeof(float)));
-	// Unbind all to prevent accidentally modyfying them 
-	VAOtest.Unbind();
-	VBOtest.Unbind();
-	EBOtest.Delete();
-
-
-
-	//TEST
-
-
-
-
-
+		
 	// Generates Vertex Array Object and binds it
 	VAO VAO1;
 	VAO1.Bind();
@@ -1797,20 +1801,41 @@ int main()
 
 											if (clickedPiece > victimPieceOrder) { clickedPiece--; }  // Make sure we select the right piece to move after updating livePieceList
 
+
 											// Give the piece a new VAO
-											
-											VAO VAOdead;
-											VAOdead.Bind();
-											EBO EBOdead(graveyardIndices[newOrder], sizeof(graveyardIndices[newOrder]));
-											linkingFunction(VAOdead, VBOtest, EBOdead, bufferAttribNum, 3, 3, 2);
-											int newDeadVaoOrder = deadPieceVaoVec.size();
-											deadPieceVaoVec.push_back(VAOdead);
+											if (players[playerTurn] == 'b') {
 
 
 
-											// Update the dead piece's order
-											deadPieceList[newOrder].setGraveOrder(newOrder, newDeadVaoOrder, deadPiecePositions);
 
+												int newPos = blackGraveyardPositions.size();
+
+												VAO VAOdead;
+												VAOdead.Bind();
+												VBO VBOdead(blackGraveyardVertices, sizeof(blackGraveyardVertices));
+												EBO EBOdead(graveyardIndices[newPos], sizeof(graveyardIndices[newPos]));
+												linkingFunction(VAOdead, VBOdead, EBOdead, bufferAttribNum, 3, 3, 2);
+												int newDeadVaoOrder = deadPieceVaoVec.size();
+												deadPieceVaoVec.push_back(VAOdead);
+
+												// Update the dead piece's order
+												deadPieceList[newOrder].setGraveOrder(newPos, newOrder, newDeadVaoOrder, blackGraveyardPositions);
+											}
+											else {
+												int newPos = whiteGraveyardPositions.size();
+
+
+												VAO VAOdead;
+												VAOdead.Bind();
+												VBO VBOdead(whiteGraveyardVertices, sizeof(whiteGraveyardVertices));
+												EBO EBOdead(graveyardIndices[newPos], sizeof(graveyardIndices[newPos]));
+												linkingFunction(VAOdead, VBOdead, EBOdead, bufferAttribNum, 3, 3, 2);
+												int newDeadVaoOrder = deadPieceVaoVec.size();
+												deadPieceVaoVec.push_back(VAOdead);
+
+												// Update the dead piece's order
+												deadPieceList[newOrder].setGraveOrder(newPos, newOrder, newDeadVaoOrder, whiteGraveyardPositions);
+											}
 										}
 										
 										// how many indices to move the piece up
@@ -1919,17 +1944,6 @@ int main()
 		//Draw the triangle using the GL_TRIANGLES primitive
 		glDrawElements(GL_TRIANGLES, 6 * (boardHeight * boardWidth), GL_UNSIGNED_INT, (void*)0);
 		
-
-
-
-		// TEST To observe graveyard please delete
-		//VAOtest.Bind();
-		//glDrawElements(GL_TRIANGLES, 6 * boardWidth, GL_UNSIGNED_INT, (void*)0);
-		
-
-
-
-
 		// Using different shader program now (this one does textures)
 		shaderProgram.Activate();
 
@@ -1949,174 +1963,6 @@ int main()
 			deadPieceVaoVec[deadPieceList[order].getVaoOrder()].Bind();
 			glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, (void*)0);
 		}
-
-
-		/*
-		// DRAW WHITE ROOK1
-		// Binds texture so that it appears in rendering
-		whiteRookTex.Bind();
-		VAO2.Bind();
-		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, (void*)0);
-
-		
-		// DRAW WHITE KNIGHT1
-		whiteKnightTex.Bind();
-		VAO3.Bind();
-		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, (void*)0);
-
-		// DRAW WHITE BISHOP1
-		whiteBishopTex.Bind();
-		VAO4.Bind();
-		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, (void*)0);
-
-		// DRAW WHITE QUEEN
-		whiteQueenTex.Bind();
-		VAO5.Bind();
-		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, (void*)0);
-
-		// DRAW WHITE KING
-		whiteKingTex.Bind();
-		VAO6.Bind();
-		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, (void*)0);
-
-		// DRAW WHITE BISHOP2
-		whiteBishopTex.Bind();
-		VAO7.Bind();
-		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, (void*)0);
-
-		// DRAW WHITE KNIGHT2
-		whiteKnightTex.Bind();
-		VAO8.Bind();
-		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, (void*)0);
-
-		// DRAW WHITE ROOK2
-		whiteRookTex.Bind();
-		VAO9.Bind();
-		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, (void*)0);
-
-		// DRAW WHITE PAWN1
-		whitePawnTex.Bind();
-		VAO10.Bind();
-		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, (void*)0);
-
-		// DRAW WHITE PAWN2
-		whitePawnTex.Bind();
-		VAO11.Bind();
-		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, (void*)0);
-
-		// DRAW WHITE PAWN3
-		whitePawnTex.Bind();
-		VAO12.Bind();
-		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, (void*)0);
-
-		// DRAW WHITE PAWN4
-		whitePawnTex.Bind();
-		VAO13.Bind();
-		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, (void*)0);
-
-		// DRAW WHITE PAWN5
-		whitePawnTex.Bind();
-		VAO14.Bind();
-		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, (void*)0);
-
-		// DRAW WHITE PAWN6
-		whitePawnTex.Bind();
-		VAO15.Bind();
-		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, (void*)0);
-
-		// DRAW WHITE PAWN7
-		whitePawnTex.Bind();
-		VAO16.Bind();
-		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, (void*)0);
-
-		// DRAW WHITE PAWN8
-		whitePawnTex.Bind();
-		VAO17.Bind();
-		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, (void*)0);
-
-		// DRAW BLACK PAWN1
-		blackPawnTex.Bind();
-		VAO18.Bind();
-		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, (void*)0);
-
-		// DRAW BLACK PAWN2
-		blackPawnTex.Bind();
-		VAO19.Bind();
-		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, (void*)0);
-
-		// DRAW BLACK PAWN3
-		blackPawnTex.Bind();
-		VAO20.Bind();
-		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, (void*)0);
-
-		// DRAW BLACK PAWN4
-		blackPawnTex.Bind();
-		VAO21.Bind();
-		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, (void*)0);
-
-		// DRAW BLACK PAWN5
-		blackPawnTex.Bind();
-		VAO22.Bind();
-		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, (void*)0);
-
-		// DRAW BLACK PAWN6
-		blackPawnTex.Bind();
-		VAO23.Bind();
-		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, (void*)0);
-
-		// DRAW BLACK PAWN7
-		blackPawnTex.Bind();
-		VAO24.Bind();
-		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, (void*)0);
-
-		// DRAW BLACK PAWN8
-		blackPawnTex.Bind();
-		VAO25.Bind();
-		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, (void*)0);
-
-		// DRAW BLACK ROOK1
-		blackRookTex.Bind();
-		VAO26.Bind();
-		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, (void*)0);
-
-		// DRAW BLACK KNIGHT1
-		blackKnightTex.Bind();
-		VAO27.Bind();
-		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, (void*)0);
-
-		// DRAW BLACK BISHOP1
-		blackBishopTex.Bind();
-		VAO28.Bind();
-		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, (void*)0);
-
-		// DRAW BLACK QUEEN
-		blackQueenTex.Bind();
-		VAO29.Bind();
-		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, (void*)0);
-
-		// DRAW BLACK KING
-		blackKingTex.Bind();
-		VAO30.Bind();
-		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, (void*)0);
-
-		// DRAW BLACK BISHOP2
-		blackBishopTex.Bind();
-		VAO31.Bind();
-		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, (void*)0);
-
-		// DRAW BLACK KNIGHT2
-		blackKnightTex.Bind();
-		VAO32.Bind();
-		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, (void*)0);
-
-		// DRAW BLACK ROOK2
-		blackRookTex.Bind();
-		VAO33.Bind();
-		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, (void*)0);
-
-
-		*/
-
 
 
 		// Swap the back buffer with the front buffer
