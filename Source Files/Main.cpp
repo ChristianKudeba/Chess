@@ -1144,61 +1144,52 @@ int main()
 	#pragma region
 	
 	// BLACK graveyard vertices
-	GLfloat blackGraveyardVertices[bufferAttribNum * 2 * (boardWidth + 1)]{};
+	GLfloat blackGraveyardVertices[bufferAttribNum * 2 * (piecesPerSide + 1)]{};
 	for (int i = 0; i < 2; ++i) { // columns
-		for (int j = 0; j < (boardWidth + 1); ++j) { // rows
-			blackGraveyardVertices[(bufferAttribNum * ((boardWidth + 1) * i + j))] = 0.1f * float(j*0.5 - boardWidth / 2); // xPos
-			blackGraveyardVertices[(bufferAttribNum * ((boardWidth + 1) * i + j)) + 1] = 0.1f * float((i*0.75 + boardHeight) / 2); // yPos
-			blackGraveyardVertices[(bufferAttribNum * ((boardWidth + 1) * i + j)) + 2] = 0.0f;  // zPos
-			blackGraveyardVertices[(bufferAttribNum * ((boardWidth + 1) * i + j)) + 3] = 0.0f;  // R
-			blackGraveyardVertices[(bufferAttribNum * ((boardWidth + 1) * i + j)) + 4] = 0.0f;  // G
-			blackGraveyardVertices[(bufferAttribNum * ((boardWidth + 1) * i + j)) + 5] = 0.0f;  // B
-			blackGraveyardVertices[(bufferAttribNum * ((boardWidth + 1) * i + j)) + 6] = float(j);  // Texture xCoord
-			blackGraveyardVertices[(bufferAttribNum * ((boardWidth + 1) * i + j)) + 7] = float(i);  // Texture yCoord
+		for (int j = 0; j < (piecesPerSide + 1); ++j) { // rows
+			blackGraveyardVertices[(bufferAttribNum * ((piecesPerSide + 1) * i + j))] = 0.1f * float(j*0.5 - boardWidth / 2); // xPos
+			blackGraveyardVertices[(bufferAttribNum * ((piecesPerSide + 1) * i + j)) + 1] = 0.1f * float((i*0.75 + boardHeight) / 2); // yPos
+			blackGraveyardVertices[(bufferAttribNum * ((piecesPerSide + 1) * i + j)) + 2] = 0.0f;  // zPos
+			blackGraveyardVertices[(bufferAttribNum * ((piecesPerSide + 1) * i + j)) + 3] = 0.0f;  // R
+			blackGraveyardVertices[(bufferAttribNum * ((piecesPerSide + 1) * i + j)) + 4] = 0.0f;  // G
+			blackGraveyardVertices[(bufferAttribNum * ((piecesPerSide + 1) * i + j)) + 5] = 0.0f;  // B
+			blackGraveyardVertices[(bufferAttribNum * ((piecesPerSide + 1) * i + j)) + 6] = float(j);  // Texture xCoord
+			blackGraveyardVertices[(bufferAttribNum * ((piecesPerSide + 1) * i + j)) + 7] = float(i);  // Texture yCoord
 		}
 	}
 
 
 	// WHITE graveyard vertices
-	GLfloat whiteGraveyardVertices[bufferAttribNum * 2 * (boardWidth + 1)]{};
+	GLfloat whiteGraveyardVertices[bufferAttribNum * 2 * (piecesPerSide + 1)]{};
 	for (int i = 0; i < 2; ++i) { // columns
-		for (int j = 0; j < (boardWidth + 1); ++j) { // rows
-			whiteGraveyardVertices[(bufferAttribNum * ((boardWidth + 1) * i + j))] = 0.1f * float(j * 0.5 - boardWidth / 2); // xPos
-			whiteGraveyardVertices[(bufferAttribNum * ((boardWidth + 1) * i + j)) + 1] = -0.1f * float((i * 0.75 + boardHeight) / 2); // yPos
-			whiteGraveyardVertices[(bufferAttribNum * ((boardWidth + 1) * i + j)) + 2] = 0.0f;  // zPos
-			whiteGraveyardVertices[(bufferAttribNum * ((boardWidth + 1) * i + j)) + 3] = 0.0f;  // R
-			whiteGraveyardVertices[(bufferAttribNum * ((boardWidth + 1) * i + j)) + 4] = 0.0f;  // G
-			whiteGraveyardVertices[(bufferAttribNum * ((boardWidth + 1) * i + j)) + 5] = 0.0f;  // B
-			whiteGraveyardVertices[(bufferAttribNum * ((boardWidth + 1) * i + j)) + 6] = float(j);  // Texture xCoord
-			whiteGraveyardVertices[(bufferAttribNum * ((boardWidth + 1) * i + j)) + 7] = float(i);  // Texture yCoord
+		for (int j = 0; j < (piecesPerSide + 1); ++j) { // rows
+			whiteGraveyardVertices[(bufferAttribNum * ((piecesPerSide + 1) * i + j))] = 0.1f * float(j * 0.5 - boardWidth / 2); // xPos
+			whiteGraveyardVertices[(bufferAttribNum * ((piecesPerSide + 1) * i + j)) + 1] = -0.1f * float((i * 0.75 + boardHeight) / 2); // yPos
+			whiteGraveyardVertices[(bufferAttribNum * ((piecesPerSide + 1) * i + j)) + 2] = 0.0f;  // zPos
+			whiteGraveyardVertices[(bufferAttribNum * ((piecesPerSide + 1) * i + j)) + 3] = 0.0f;  // R
+			whiteGraveyardVertices[(bufferAttribNum * ((piecesPerSide + 1) * i + j)) + 4] = 0.0f;  // G
+			whiteGraveyardVertices[(bufferAttribNum * ((piecesPerSide + 1) * i + j)) + 5] = 0.0f;  // B
+			whiteGraveyardVertices[(bufferAttribNum * ((piecesPerSide + 1) * i + j)) + 6] = float(j);  // Texture xCoord
+			whiteGraveyardVertices[(bufferAttribNum * ((piecesPerSide + 1) * i + j)) + 7] = float(i);  // Texture yCoord
 		}
 	}
 
 	// graveyard indices
-	GLuint testIndices[6 * 2 * boardWidth]{};// delete this
-	GLuint graveyardIndices[2 * boardWidth][6]{};
+	GLuint graveyardIndices[2 * piecesPerSide][6]{};
 	n = 0;
-	for (int m = 0; m < (2 * boardWidth); ++m)
+	for (int m = 0; m < (2 * piecesPerSide); ++m)
 	{
-		if (((m + n + 1) % (boardWidth + 1)) == 0) // if m represents an "edge" vertex
+		if (((m + n + 1) % (piecesPerSide + 1)) == 0) // if m represents an "edge" vertex
 		{
 			n++;
 		}
 
-		// testIndices are used to display the graveyard DELETE THIS
-		testIndices[6 * m] = m + n + boardWidth + 2;
-		testIndices[6 * m + 1] = m + n + boardWidth + 1;
-		testIndices[6 * m + 2] = m + n;
-		testIndices[6 * m + 3] = m + n + boardWidth + 2;
-		testIndices[6 * m + 4] = m + n + 1;
-		testIndices[6 * m + 5] = m + n;
-
 		// graveyardIndices are used to determine the placement of pieces when they die
 		graveyardIndices[m][0] = m + n;
-		graveyardIndices[m][1] = m + n + boardWidth + 2;
-		graveyardIndices[m][2] = m + n + boardWidth + 1;
+		graveyardIndices[m][1] = m + n + piecesPerSide + 2;
+		graveyardIndices[m][2] = m + n + piecesPerSide + 1;
 		graveyardIndices[m][3] = m + n;
-		graveyardIndices[m][4] = m + n + boardWidth + 2;
+		graveyardIndices[m][4] = m + n + piecesPerSide + 2;
 		graveyardIndices[m][5] = m + n + 1;
 	};
 	#pragma endregion
