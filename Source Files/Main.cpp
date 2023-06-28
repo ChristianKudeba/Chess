@@ -1164,7 +1164,7 @@ int main()
 	for (int i = 0; i < 2; ++i) { // columns
 		for (int j = 0; j < (piecesPerSide + 1); ++j) { // rows
 			whiteGraveyardVertices[(bufferAttribNum * ((piecesPerSide + 1) * i + j))] = 0.1f * float(j * 0.5 - boardWidth / 2); // xPos
-			whiteGraveyardVertices[(bufferAttribNum * ((piecesPerSide + 1) * i + j)) + 1] = -0.1f * float((i * 0.75 + boardHeight) / 2); // yPos
+			whiteGraveyardVertices[(bufferAttribNum * ((piecesPerSide + 1) * i + j)) + 1] = -0.1f * float((0.75 - i * 0.75 + boardHeight) / 2); // yPos
 			whiteGraveyardVertices[(bufferAttribNum * ((piecesPerSide + 1) * i + j)) + 2] = 0.0f;  // zPos
 			whiteGraveyardVertices[(bufferAttribNum * ((piecesPerSide + 1) * i + j)) + 3] = 0.0f;  // R
 			whiteGraveyardVertices[(bufferAttribNum * ((piecesPerSide + 1) * i + j)) + 4] = 0.0f;  // G
