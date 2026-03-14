@@ -114,12 +114,13 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>C:\Users\Christian\source\repos\Chess\Libraries\include\glad;C:\Users\Christian\source\repos\Chess\Header Files;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Users\chris\source\repos\Chess\Libraries\include;C:\Users\chris\source\repos\Chess\Header Files;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalDependencies>glfw3.lib;opengl32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>C:\Users\chris\source\repos\Chess\Libraries\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -139,7 +140,9 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="Source Files\EBO.cpp" />
+    <ClCompile Include="Source Files\EBO.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
+    </ClCompile>
     <ClCompile Include="Source Files\glad.c" />
     <ClCompile Include="Source Files\Main.cpp" />
     <ClCompile Include="Source Files\shaderClass.cpp" />
@@ -150,7 +153,9 @@
     <ClCompile Include="Source Files\VBO.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Header Files\EBO.h" />
+    <ClInclude Include="Header Files\EBO.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
+    </ClInclude>
     <ClInclude Include="Header Files\shaderClass.h" />
     <ClInclude Include="Header Files\Test.h" />
     <ClInclude Include="Header Files\Texture.h" />
